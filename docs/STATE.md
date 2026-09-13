@@ -1,10 +1,10 @@
-# Current State — updated 2026-09-13T23:15Z (Block 1 nearly complete)
+# Current State — updated 2026-09-13T23:40Z (Block 1 COMPLETE)
 
-Block: 1 (specs) — discovery done, all 4 specs + plans + tasks + ADRs drafted and resolved.
-One PR away from Block 1 being fully complete.
+Block: 1 (specs) — **complete.** All 4 specs merged, plans/tasks/ADRs merged, Project board
+current. Ready to start Block 2 (parallel worktree build).
 
-Active specs: `SPEC-000` merged (approved). `SPEC-001`/`002`/`003` drafted, all open
-questions resolved with Dele, ready to merge.
+Active specs: `SPEC-000`/`001`/`002`/`003` all merged, Status: approved (Tier 2 traceability
+not yet active for any — that flips per-spec once Block 2's builder adds real tests).
 
 ## In flight
 
@@ -22,20 +22,26 @@ questions resolved with Dele, ready to merge.
   issues filed, #27-59), and `ADR-0002`/`ADR-0003`. 8 flagged assumptions, all resolved
   (4 confirmed with Dele as real product decisions, 4 confirmed as reasonable low-stakes
   defaults) — see decision-log for the full list.
-- `npm run check:traceability` passes (Tier 1) across all 4 specs.
-- No open PRs right now, no active feature worktrees — Block 0/1 work has been sequential
+- PR #60 merged (SPEC-001/002/003 + PLAN-000..003 + TASKS-000..003 + ADR-0002/0003), all
+  6 checks passed for real. `npm run check:traceability` passes (Tier 1) across all 4 specs
+  on `main`.
+- Project board is current: 57 open issues total (epics #2-4/18-25, task #5, stories
+  #6-17, implementation tasks #27-59), all correctly placed in the `Plan/Tasks` column —
+  specs/plans/tasks exist, nothing is implemented yet.
+- No open PRs right now, no active feature worktrees — all Block 0/1 work was sequential
   on `main` or single-purpose branches; worktrees start in Block 2.
-- CI on `main`: green on every push/PR so far.
+- CI on `main`: green on every push/PR so far, no exceptions.
 
 ## Next 3 actions
 
-1. Commit SPEC-001/002/003 + plans + tasks + ADR-0002/0003, open a PR, confirm all 6
-   checks pass, merge — this closes out Block 1
-2. `/checkpoint` once merged, then start Block 2: three worktrees (app / MCP server /
-   platform), three agents in parallel — the showpiece block
-3. Before Block 2 builders start deeply on the stakeholder feature or the MCP server:
-   reconcile the exact MCP tool contract between them first (see coordination note below)
-   — `PLAN-003`'s MCP client interface is written against the plan doc, not a real server
+1. Start Block 2: create 3 worktrees (app slice / MCP server / platform) and launch
+   `builder` (×2) + `platform-engineer` in parallel — the showpiece block
+2. Before the app-slice and MCP-server builders go deep: reconcile the exact MCP tool
+   contract between them (see coordination risk below) — do this first, not after both
+   have built assumptions independently
+3. Each builder works its `TASKS-00N` issue list under `test-driven-development` +
+   `verification-before-completion`; flip its spec's `Status:` to `implemented` in the
+   same PR that adds the real tests
 
 ## Blockers / open decisions
 
