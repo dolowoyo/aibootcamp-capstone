@@ -1,0 +1,24 @@
+{
+  "name": "@aibootcamp-capstone/mcp-onboarding-context",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Stdio MCP server serving fabricated org/calendar data (fixtures/synthetic-org.json) to both the app's stakeholder-map feature and dev-time agents, per docs/mcp-tool-contract.md.",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.6.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.11"
+  }
+}
