@@ -260,3 +260,43 @@ prove the *policy* was coherent across a multi-spec, incrementally-implemented p
 distinction worth being explicit about, since it's an easy one to miss.
 
 ---
+
+## 2026-09-13 — SPEC-001/002/003 + plans + tasks + ADRs resolved
+
+**Context:** `architect` drafted SPEC-001 (STARS diagnosis, 8 ACs), SPEC-002 (30/60/90 plan,
+8 ACs), SPEC-003 (stakeholder map, 7 ACs), all four plans (PLAN-000..003), all four task
+breakdowns (33 GitHub issues filed, #27-59), and ADR-0002/0003 — flagging 8 assumptions/open
+questions rather than silently deciding any of them.
+
+**Decisions:**
+- SPEC-001: thin/ambiguous intake still produces a Low-confidence diagnosis with an explicit
+  caveat, never a refusal — confirmed with Dele (pipeline never strands the user with
+  nothing).
+- SPEC-001/002: overriding a diagnosis after a plan already exists never auto-regenerates or
+  discards that plan — confirmed with Dele. Regeneration is always an explicit user action;
+  the original diagnosis is preserved internally (not user-facing) precisely so a future
+  regenerate action has something to diff against.
+- SPEC-001: 50-character narrative minimum and categorical (Low/Medium/High) confidence —
+  both confirmed as reasonable, low-stakes defaults.
+- SPEC-003: the 5.5-midpoint/ties-resolve-low quadrant tie-break rule (PLAN-003), and
+  "incomplete record" scoped to a missing influence/support value specifically (not any
+  missing field) — both confirmed as reasonable.
+- PLAN-003's schema living at `lib/stakeholders/schema.ts` rather than `lib/inference/schemas/`
+  — confirmed; it's genuinely a different boundary (MCP client, not LLM inference), so a
+  separate location is the more honest structure, not an inconsistency.
+
+**Flagged, not a decision — a Block 2 coordination risk:** `PLAN-003`'s MCP client interface
+is written against tool names/shapes described in `docs/00-capstone-plan.md`, not a real,
+tested server (`mcp/onboarding-context` doesn't exist until Block 2's W2 worktree). Whoever
+builds the app-side stakeholder feature (W1) and whoever builds the MCP server (W2) should
+reconcile the exact tool contract early in Block 2, before either builds deeply against an
+assumed shape. Noted in `docs/STATE.md` as a standing Block 2 coordination item.
+
+**Why this batch approach:** all three specs plus their downstream plans/tasks/ADRs were
+authored together as one coherent architect pass building on the same merged SPEC-000, so
+reviewing and merging them as one PR is the right grain — three separate PRs would have
+added ceremony without adding independent review value, since none of the three specs could
+sensibly merge without the other two also existing (SPEC-002 depends on SPEC-001; the task
+issues reference all three).
+
+---
