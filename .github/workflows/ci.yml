@@ -24,8 +24,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      # TODO(Block 2): once app/ exists, run `npm run lint --workspaces --if-present`
-      - run: echo "lint placeholder — wired up once app/ scaffolding lands in Block 2"
+      - run: npm run lint
 
   typecheck:
     runs-on: ubuntu-latest
@@ -36,8 +35,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      # TODO(Block 2): `npm run typecheck --workspaces --if-present`
-      - run: echo "typecheck placeholder — wired up once app/ scaffolding lands in Block 2"
+      - run: npm run typecheck
 
   traceability:
     # The hard gate. Every AC in every docs/specs/SPEC-*.md must trace to a real,
@@ -62,8 +60,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      # TODO(Block 2): `npm run test --workspace app` (Vitest, LLM_PROVIDER=fixture)
-      - run: echo "unit test placeholder — wired up once app/ scaffolding lands in Block 2"
+      - run: npm run test
 
   build:
     runs-on: ubuntu-latest
@@ -74,11 +71,12 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      # TODO(Block 2/3): `npm run build --workspace app`
-      - run: echo "build placeholder — wired up once app/ scaffolding lands in Block 2"
+      - run: npm run build
 
   e2e:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/first90_test?schema=public
     services:
       postgres:
         image: postgres:16
@@ -99,5 +97,5 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      # TODO(Block 2/3): `npx playwright install --with-deps && npm run test:e2e --workspace app`
-      - run: echo "e2e placeholder — wired up once app/ scaffolding lands in Block 2"
+      - run: npx playwright install --with-deps
+      - run: npm run test:e2e
