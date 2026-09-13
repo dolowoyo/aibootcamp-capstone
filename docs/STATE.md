@@ -1,26 +1,29 @@
-# Current State — updated 2026-09-13T21:10Z (Block 0 complete, drill passed)
+# Current State — updated 2026-09-13T22:05Z (Block 1 in progress)
 
-Block: 0 (foundation) — **complete**. Resume drill passed via a fresh subagent running
-`/resume-capstone` cold: correctly reconstructed state, cross-checked live git/gh signals
-with no prompting, and caught a real gap (an in-flight CI run STATE.md's text hadn't
-resolved yet). That run has since finished green.
+Block: 1 (specs) — discovery done, specs not started yet.
 
 Active specs: none yet — SPEC-000/001/002/003 not started
 
 ## In flight
 
-- Repo scaffolding: complete and pushed (commits `d98e65e`, `30b34e0` on `main`)
-- No open issues, no open PRs, no active feature worktrees yet
-- CI on `main`: green on all 3 pushes so far (placeholder lint/typecheck/unit/build/e2e
-  steps plus a real `traceability` check passing trivially — no specs exist yet)
+- `product-owner` completed: 24 GitHub issues filed (3 shipped epics #2-4, 1 infra task #5,
+  12 stories #6-17, 8 backlog epics #18-25), all added to the Project board (#2-17 → Spec
+  column, #18-25 → Backlog column)
+- Two scope questions from product-owner resolved with Dele: backlog stays epic-level only
+  (no story breakdown); SPEC-003 stays a static map, Coalition Action Planner (#23) is a
+  separate backlog epic, not folded in — see decision-log
+- No open PRs, no active feature worktrees yet — all Block 0/1 work has been direct on
+  `main`, no worktree isolation needed (nothing parallel yet; worktrees start in Block 2)
+- CI on `main`: green on every push so far
 
 ## Next 3 actions
 
-1. Restructure `CLAUDE.md` for context-loading efficiency (in progress) — move
-   phase-specific detail into skills/ADRs loaded on demand rather than every session start
-2. Move to Block 1 — `/brainstorm` with `product-owner` on the Watkins epic breakdown
-3. `architect` drafts SPEC-000 (inference provider contract) first — SPEC-001/002/003 depend
-   on its interface
+1. Launch `architect` to draft `SPEC-000` (inference provider contract) — SPEC-001/002/003
+   depend on its interface, so it goes first
+2. `architect` drafts `SPEC-001`/`002`/`003` from issues #2-17, each with numbered ACs and
+   traceability tables (tests don't exist yet — that's `builder`'s job in Block 2)
+3. `architect` drafts `PLAN-001..003` (writing-plans skill), `TASKS-*`, and
+   ADR-0002 (fixture-first testing) / ADR-0003 (local IaC)
 
 ## Blockers / open decisions
 

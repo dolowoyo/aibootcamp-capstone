@@ -175,3 +175,23 @@ without the second — a genuine, specific finding about building multi-agent sy
 generic "always check your config" moral.
 
 ---
+
+## 2026-09-13 — Backlog depth and SPEC-003 scope, confirmed with Dele
+
+**Context:** `product-owner` filed 24 issues (3 shipped epics, 1 infra task, 12 stories, 8
+backlog-only epics) and flagged two open questions rather than deciding them itself, per its
+mandate not to own scope.
+
+**Decision:** (1) Backlog epics stay at epic-level only — no story breakdown for unshipped
+work. (2) `#23 Coalition Action Planner` (what to *do* about stakeholder influence/support)
+stays a separate backlog epic; `SPEC-003` ships as a static influence×support map only, not
+map-plus-recommendations.
+
+**Why:** Story-level detail on work that won't be built this capstone is lower-value than
+moving to the actual specs now — epic-level breadth across 8 distinct concepts already
+demonstrates real discovery depth. Keeping SPEC-003 to a static map keeps its AC list tight
+and testable within the time budget, rather than quietly growing scope right before the
+spec is even written — a good example of principle IX (ship the cut, keep quality) applied
+before the cut was even necessary, not after time pressure forced it.
+
+---
