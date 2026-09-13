@@ -9,6 +9,30 @@ This is the noun half of the project's process (superpowers skills are the verb 
 `CLAUDE.md`). Use this whenever producing an artifact in this repo, so every agent produces
 the same shape without re-deriving it each time.
 
+## The SDD chain
+
+Specs are the source of truth. Code, tests, issues, and PRs are derived from them and traced
+back mechanically:
+
+```text
+docs/constitution.md        principles that outrank any individual spec
+  └── docs/specs/SPEC-00N    WHAT + WHY. Numbered acceptance criteria (AC-N.M). No how.
+       └── docs/plans/PLAN-00N   HOW. Technical approach, interfaces, tradeoffs.
+            └── docs/tasks/TASKS-00N   Issue-sized units, each naming the ACs it satisfies.
+                 └── GitHub issues     one per task, labeled spec:SPEC-00N
+                      └── tests        one named test per AC, written BEFORE implementation
+                           └── PR → reviewer agent → CI gate → merge
+```
+
+`scripts/check-traceability.ts` parses every spec's traceability table and **fails CI** if
+any AC has no matching test, or any row points at a test that doesn't exist. It runs as a
+required status check on `main` — this is not decoration, it is the gate
+(`docs/constitution.md`, principle II).
+
+**When a spec turns out to be wrong:** change the spec first, in its own PR, before touching
+the implementation, then log the amendment in `docs/decision-log.md` with the reason. Scope
+drift must be a reviewable event, never a silent one (principle VI).
+
 ## File locations and naming
 
 | Artifact | Path | Naming |
@@ -24,7 +48,9 @@ the same shape without re-deriving it each time.
 ## Acceptance criteria
 
 Format: `AC-<spec-number>.<sequence>`, e.g. `AC-1.1`, `AC-1.2`, `AC-2.1`. Always written as
-observable behaviour a user or test can verify — never as an internal implementation detail.
+**observable behaviour** a user or test can verify — never as an internal implementation
+detail. Not "the service validates input" but "an intake with fewer than 50 characters of
+narrative is rejected with a field-level error naming the field."
 
 ## Traceability table
 

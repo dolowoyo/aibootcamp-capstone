@@ -1,6 +1,9 @@
-# Current State — updated 2026-09-13T20:47Z (Block 0 complete)
+# Current State — updated 2026-09-13T21:10Z (Block 0 complete, drill passed)
 
-Block: 0 (foundation) — complete, pending resume drill verification
+Block: 0 (foundation) — **complete**. Resume drill passed via a fresh subagent running
+`/resume-capstone` cold: correctly reconstructed state, cross-checked live git/gh signals
+with no prompting, and caught a real gap (an in-flight CI run STATE.md's text hadn't
+resolved yet). That run has since finished green.
 
 Active specs: none yet — SPEC-000/001/002/003 not started
 
@@ -8,15 +11,14 @@ Active specs: none yet — SPEC-000/001/002/003 not started
 
 - Repo scaffolding: complete and pushed (commits `d98e65e`, `30b34e0` on `main`)
 - No open issues, no open PRs, no active feature worktrees yet
-- CI on `main`: green on both pushes so far (placeholder lint/typecheck/unit/build/e2e steps
-  + real `traceability` check passing trivially — no specs exist yet)
+- CI on `main`: green on all 3 pushes so far (placeholder lint/typecheck/unit/build/e2e
+  steps plus a real `traceability` check passing trivially — no specs exist yet)
 
 ## Next 3 actions
 
-1. Run the Block 0 resume drill (checkpoint → clear/fresh-session → resume-capstone) —
-   in progress right now, this file is that drill's checkpoint step
-2. Once drill passes: run `/plugin` install confirmation, then move to Block 1 — `/brainstorm`
-   with `product-owner` on the Watkins epic breakdown
+1. Restructure `CLAUDE.md` for context-loading efficiency (in progress) — move
+   phase-specific detail into skills/ADRs loaded on demand rather than every session start
+2. Move to Block 1 — `/brainstorm` with `product-owner` on the Watkins epic breakdown
 3. `architect` drafts SPEC-000 (inference provider contract) first — SPEC-001/002/003 depend
    on its interface
 
@@ -36,7 +38,7 @@ Active specs: none yet — SPEC-000/001/002/003 not started
 
 ## Do not forget
 
-- The Block 0 resume drill (this checkpoint + a fresh-session `/resume-capstone`) must pass
-  before Block 1 starts — see `docs/00-capstone-plan.md` verification step A.
 - `check-traceability.ts` was already proven end-to-end (pass → induced failure → clean pass)
   before being trusted as the CI gate — see commit `d98e65e`'s message.
+- If a subagent needs to inspect the broken `copilot-worktrees` worktree, `git status` inside
+  it can hang — use `ls` to probe it instead, don't run git commands against it blind.

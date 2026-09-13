@@ -86,3 +86,37 @@ single point of failure with no fallback if it doesn't, right when the merge flo
 critical path. Can be revisited if there's time to spare later.
 
 ---
+
+## 2026-09-13 — Slimmed CLAUDE.md; moved phase-specific detail to on-demand files
+
+**Context:** Dele flagged that `CLAUDE.md` (158 lines) risked loading too much context at
+every session start, when most of its content is only relevant during specific phases of
+work.
+
+**Decision:** Restructured. `CLAUDE.md` kept only what's true in every session: the identity
+note, the 5 non-negotiable rules, a compact bound-skills table, one paragraph on session
+continuity (with pointers), one paragraph on the inference boundary (with a pointer), data
+policy, and the don't-list — 98 lines / ~675 words, down from 158/~1045.
+
+Moved: the full SDD chain diagram + traceability mechanics → merged into the
+`capstone-conventions` skill (which already covered adjacent ground — this also removed a
+real duplication, not just a relocation). The full inference-boundary diagram and reasoning
+→ `docs/adr/0001-inference-boundary.md` (a real ADR, pulled forward from its originally
+planned Block 1 slot). The full session-continuity mechanics were already living in
+`.claude/commands/checkpoint.md` / `resume-capstone.md` — CLAUDE.md's copy was redundant and
+got cut to a pointer. The "Conventions" section was fully redundant with
+`capstone-conventions`'s existing "Git conventions" section and was deleted outright.
+
+**Why:** Skills and ADRs are loaded on demand (by name, or when an agent actually touches the
+area they govern) — CLAUDE.md is loaded into every session regardless of relevance. Content
+that's only needed 20% of the time doesn't belong in the 100%-of-the-time file. This is a
+direct, concrete application of context engineering (Session 2 on the learning roadmap) to
+the project's own scaffolding, not just to the app being built — worth its own beat in the
+video rather than folding it into a generic "we used CLAUDE.md" mention.
+
+**Alternative considered:** Using `@path` imports inside CLAUDE.md to reference the other
+files. Rejected — imports are resolved and inlined at session start same as the rest of the
+file, so it wouldn't have reduced what's actually loaded; only genuinely on-demand
+mechanisms (skills, ADRs read when relevant) do that.
+
+---
