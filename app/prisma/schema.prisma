@@ -1,0 +1,64 @@
+// First 90 — Prisma schema (Postgres 16).
+//
+// Models here back the persistence layer for SPEC-001 (DiagnosisRecord), SPEC-002
+// (Plan/Milestone), and SPEC-003 (Stakeholder). Unit tests in lib/ exercise the pure
+// domain logic against an in-memory repository (see lib/plan/repository.ts) so the test
+// suite never needs a live database connection; these models are what the app's API routes
+// write through in a real running instance (docker-compose/Terraform-provisioned Postgres).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model DiagnosisRecord {
+  id            String   @id @default(cuid())
+  narrative     String
+  dominantType  String
+  secondaryType String?
+  confidence    String
+  rationale     String
+  evidence      Json
+  override      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  plan Plan?
+}
+
+model Plan {
+  id           String   @id @default(cuid())
+  diagnosisId  String   @unique
+  diagnosis    DiagnosisRecord @relation(fields: [diagnosisId], references: [id])
+  milestones   Milestone[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Milestone {
+  id         String @id @default(cuid())
+  externalId String // the app-level milestone id used by lib/inference/schemas/plan.ts
+  planId     String
+  plan       Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+  phase      String // "1-30" | "31-60" | "61-90"
+  order      Int
+  text       String
+  rationale  String
+
+  @@unique([planId, externalId])
+}
+
+model Stakeholder {
+  id        String   @id @default(cuid())
+  name      String
+  influence Int
+  support   Int
+  quadrant  String // "ally" | "opponent" | "keep-informed" | "monitor"
+  source    String // "mcp" | "manual"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
