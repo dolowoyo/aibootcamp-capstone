@@ -24,10 +24,13 @@ docs/constitution.md        principles that outrank any individual spec
                            └── PR → reviewer agent → CI gate → merge
 ```
 
-`scripts/check-traceability.ts` parses every spec's traceability table and **fails CI** if
-any AC has no matching test, or any row points at a test that doesn't exist. It runs as a
-required status check on `main` — this is not decoration, it is the gate
-(`docs/constitution.md`, principle II).
+`scripts/check-traceability.ts` parses every spec's traceability table and enforces it in two
+tiers, so a spec can merge (fixing its contract) before its tests exist without permanently
+redding out `main`'s required checks: **Tier 1** (always) — every AC has exactly one
+well-formed traceability row, no dangling or duplicate references. **Tier 2** (only once a
+spec's `Status:` is `implemented`) — every row must resolve to a real, existing test. Flip a
+spec to `implemented` in the same PR that adds its tests — from then on, deleting a row or a
+test fails CI exactly as intended (`docs/constitution.md`, principle II).
 
 **When a spec turns out to be wrong:** change the spec first, in its own PR, before touching
 the implementation, then log the amendment in `docs/decision-log.md` with the reason. Scope
@@ -56,9 +59,11 @@ narrative is rejected with a field-level error naming the field."
 
 Every spec's `## Traceability` section is a markdown table with exactly these three columns,
 in this order: `AC | Behaviour | Test`. The Test column format is always
-`path/to/file.spec.ts > describe block > test name` — this exact string (or a prefix of it
-ending after the file path, if there's no describe block) is what
-`scripts/check-traceability.ts` parses and verifies against the real test file.
+`path/to/file.spec.ts > describe block > test name`, written **plain, without backtick
+wrapping** — this exact string (or a prefix of it ending after the file path, if there's no
+describe block) is what `scripts/check-traceability.ts` parses and verifies against the real
+test file. (The script strips leading/trailing backticks defensively, but don't rely on
+that — the table is parsed as data, not rendered as code, so write it plain.)
 
 Get this format wrong and the traceability gate silently mis-parses the row — when writing
 or editing a traceability table, run `npm run check:traceability` immediately after to catch

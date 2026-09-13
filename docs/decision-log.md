@@ -195,3 +195,68 @@ spec is even written — a good example of principle IX (ship the cut, keep qual
 before the cut was even necessary, not after time pressure forced it.
 
 ---
+
+## 2026-09-13 — SPEC-000 drafted; two real findings from architect
+
+**Context:** `architect` drafted `SPEC-000` (inference provider contract, 11 ACs) — the
+foundational spec everything else depends on.
+
+**Finding 1 (bug):** `docs/specs/_TEMPLATE.md` showed the traceability table's Test column
+wrapped in backticks, but `scripts/check-traceability.ts` split each cell on `>` without
+stripping them — so any spec author who copied the template literally would produce a
+traceability row that could never resolve, even once the real test file existed, because the
+parsed "file path" would carry a permanent stray backtick. Architect caught this by hand-
+checking their own table before it was ever exercised by CI. **Fixed both sides:** the script
+now strips leading/trailing backticks defensively, and the template (plus the matching
+example in the `capstone-conventions` skill) no longer uses backticks in that column, so the
+next spec author won't reproduce the mistake in the first place.
+
+**Finding 2 (real design question, not silently decided):** SPEC-001/SPEC-002 conceptually
+own the actual field shapes of `StarsDiagnosis` and the milestone objects, but those schema
+*modules* need to exist before SPEC-000's adapters can be built, and before SPEC-001/002
+exist to define them. **Resolved with Dele:** `PLAN-000` defines schema module locations and
+the validation mechanism only; `SPEC-001`/`SPEC-002` own and commit the actual field
+contents once written. Logged directly in SPEC-000's Open Questions section as resolved,
+not just here.
+
+**Why this matters for the video:** both are exactly the kind of finding a spec-first process
+is supposed to surface *before* three parallel builders hit them independently in Block 2 —
+the traceability bug would otherwise have surfaced as "the CI check is broken" days later
+with no obvious cause, and the schema-ownership question would otherwise have been three
+different guesses from three different agents.
+
+---
+
+## 2026-09-13 — Traceability gate redesigned as two-tier, before merging the first spec
+
+**Context:** About to merge `SPEC-000` via a real PR to exercise the required `traceability`
+CI check for the first time. Running the check locally against the finished spec revealed a
+design flaw: the script required every traceability row to resolve to a real, existing test
+file — but specs are meant to merge in Block 1, before their tests exist (that's the entire
+point of spec-first development; tests come from `builder`'s TDD in Block 2). Once SPEC-000
+merged, `main`'s required `traceability` check would have stayed red for the rest of Block 1
+and much of Block 2 — blocking every subsequent PR, including the three parallel Block 2
+builds, none of which individually satisfy all ACs across all four specs at once.
+
+**Decision:** Split enforcement into two tiers. **Tier 1** (always enforced, any spec status):
+every declared AC has exactly one well-formed traceability row, no dangling references, no
+duplicates. **Tier 2** (enforced only once a spec's `Status:` field reads `implemented`):
+every row must resolve to a real test file containing the named test title. A spec merges as
+`draft`/`approved` with Tier 1 passing and Tier 2 not yet applicable; whoever's PR adds the
+real tests flips the spec to `implemented` in that same PR, and from then on Tier 2 enforces
+for real — so the "delete a row, watch CI go red" demo moment still works exactly as
+designed, just against a spec that's actually reached that stage.
+
+Verified before trusting it: ran the check against `SPEC-000` at `Status: approved` (passed,
+Tier 2 skipped as expected), then against a copy manually flipped to `Status: implemented`
+with the same missing tests (failed with a specific, correct violation), then restored the
+real file and reconfirmed green.
+
+**Why:** This is the second real gap the traceability gate's *design* — not its parsing —
+had before a single spec was merged (the first was the backtick bug). Both were caught by
+actually trying to use the gate for its real purpose rather than only testing it against a
+throwaway fixture in Block 0. The throwaway test proved the *parser* worked; it didn't
+prove the *policy* was coherent across a multi-spec, incrementally-implemented project — a
+distinction worth being explicit about, since it's an easy one to miss.
+
+---
