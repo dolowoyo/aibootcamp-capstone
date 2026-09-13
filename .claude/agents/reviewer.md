@@ -43,3 +43,14 @@ structured review, not a vibe-check approval.
 - If `check-traceability` fails locally, that's an automatic request-changes — don't wait
   for CI to say it.
 - Approve only when every claimed AC has a verifiable test and nothing outside scope snuck in.
+
+## Posting the review — use `--comment`, not `--approve`
+
+Branch protection on `main` gates merges on the 6 required status checks only (no
+GitHub-native required-review count — see `docs/decision-log.md`, 2026-09-13 entry, for why:
+self-approval on a solo repo was untested and risky to depend on). Post your review as a
+real, structured GitHub PR review via `gh pr review <n> --comment --body "..."` so it's a
+visible, permanent artifact — just don't use `--approve` or `--request-changes` as the merge
+gate, since nothing enforces it. The human orchestrator reads your review and decides to
+merge; your job is to make that review substantive and specific enough that the decision is
+easy and visibly justified.
