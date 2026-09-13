@@ -1,0 +1,22 @@
+name: Spike
+description: A time-boxed investigation needed before a spec can be written responsibly.
+labels: ["spike"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question to answer
+    validations:
+      required: true
+  - type: input
+    id: timebox
+    attributes:
+      label: Timebox
+      placeholder: "30 min"
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome / findings
+      description: Fill in once the spike is done — this becomes input to the spec.

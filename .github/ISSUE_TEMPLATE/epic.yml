@@ -1,0 +1,32 @@
+name: Epic
+description: A large body of work derived from the Watkins framework, broken down into stories/tasks.
+labels: ["epic"]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: User outcome
+      description: What can a user do after this ships that they couldn't before?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why this matters
+      description: Tie back to the specific Watkins concept this epic implements.
+    validations:
+      required: true
+  - type: dropdown
+    id: disposition
+    attributes:
+      label: Disposition
+      options:
+        - Shipped in vertical slice
+        - Backlog — post-capstone
+    validations:
+      required: true
+  - type: input
+    id: spec
+    attributes:
+      label: Related spec (if one exists yet)
+      placeholder: SPEC-001

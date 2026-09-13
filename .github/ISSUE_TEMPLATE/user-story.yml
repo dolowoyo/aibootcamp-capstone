@@ -1,0 +1,33 @@
+name: User Story / Task
+description: An issue-sized unit of work derived from a merged spec's task breakdown.
+labels: ["story"]
+body:
+  - type: input
+    id: spec
+    attributes:
+      label: Spec
+      description: Which spec does this satisfy?
+      placeholder: SPEC-001
+    validations:
+      required: true
+  - type: input
+    id: acs
+    attributes:
+      label: Satisfies
+      description: Which acceptance criteria does this task satisfy? (comma-separated)
+      placeholder: AC-1.1, AC-1.3
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What needs to be built
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria (restated from the spec)
+      description: Copy the exact AC text from the spec — this issue should be closeable by satisfying exactly this.
+    validations:
+      required: true

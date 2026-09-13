@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "onboarding-context": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["mcp/onboarding-context/dist/index.js"],
+      "_comment": "Built in Block 2 (see docs/00-capstone-plan.md). Rename this file to .mcp.json once mcp/onboarding-context/dist/index.js exists — Claude Code retries a missing server every turn, so it's kept inert as .example until then."
+    }
+  }
+}

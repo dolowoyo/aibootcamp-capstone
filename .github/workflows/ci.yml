@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same ref
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  LLM_PROVIDER: fixture # Tests and CI never call live inference — see CLAUDE.md
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # TODO(Block 2): once app/ exists, run `npm run lint --workspaces --if-present`
+      - run: echo "lint placeholder — wired up once app/ scaffolding lands in Block 2"
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # TODO(Block 2): `npm run typecheck --workspaces --if-present`
+      - run: echo "typecheck placeholder — wired up once app/ scaffolding lands in Block 2"
+
+  traceability:
+    # The hard gate. Every AC in every docs/specs/SPEC-*.md must trace to a real,
+    # existing test. This job must exist and be required before the first spec is merged —
+    # see docs/00-capstone-plan.md, Block 0.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run check:traceability
+
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # TODO(Block 2): `npm run test --workspace app` (Vitest, LLM_PROVIDER=fixture)
+      - run: echo "unit test placeholder — wired up once app/ scaffolding lands in Block 2"
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # TODO(Block 2/3): `npm run build --workspace app`
+      - run: echo "build placeholder — wired up once app/ scaffolding lands in Block 2"
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: first90_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # TODO(Block 2/3): `npx playwright install --with-deps && npm run test:e2e --workspace app`
+      - run: echo "e2e placeholder — wired up once app/ scaffolding lands in Block 2"

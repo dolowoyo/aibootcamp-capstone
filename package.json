@@ -1,0 +1,11 @@
+{
+  "name": "aibootcamp-capstone",
+  "private": true,
+  "description": "First 90 — an AI-assisted onboarding accelerator for the first 90 days in a new role, built as an AI Bootcamp capstone.",
+  "scripts": {
+    "check:traceability": "tsx scripts/check-traceability.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  }
+}
