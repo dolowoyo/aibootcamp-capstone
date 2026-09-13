@@ -323,3 +323,29 @@ document, not a testable-behavior spec — named without a `SPEC-` prefix specif
 `check-traceability.ts` doesn't try to parse it as one.
 
 ---
+
+## 2026-09-14 — Missed a second coordination contract before Block 2 launch
+
+**Context:** Before launching Block 2's three parallel worktrees, I pre-resolved the MCP
+tool contract (`docs/mcp-tool-contract.md`) specifically because `PLAN-003` had flagged it as
+a coordination risk. I didn't do the equivalent for the inference sidecar's HTTP wire shape
+(request/response format between `lib/inference/adapters/sidecar.ts` in the app worktree and
+`services/inference-sidecar/` in the MCP worktree) — `PLAN-000` only specifies the
+`InferenceProvider` interface, not that wire shape, and nothing flagged this one in Block 1
+the way `PLAN-003` flagged the MCP contract. W2 (MCP-server builder) hit it directly, had to
+design the contract itself mid-task, and documented it clearly in
+`services/inference-sidecar/README.md` rather than silently guessing.
+
+**Decision:** Caught this while W2's PR was still the only one back and W1 (app-slice
+builder) was still running — sent W1 the real contract via `SendMessage` before it could
+finish building `sidecar.ts` against an independent guess, rather than discovering a mismatch
+only after both PRs were open.
+
+**Why this matters for the video:** the MCP contract worked because I anticipated the risk
+in Block 1. This one didn't get anticipated the same way, and the fix — a live mid-flight
+message to a running background agent, using the actual documented contract the other agent
+had just produced — is a genuinely interesting "gotcha" and recovery, arguably a better one
+than the case that went right the first time. Worth naming honestly in the video rather than
+only showcasing the contract that was caught in advance.
+
+---

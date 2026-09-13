@@ -13,10 +13,14 @@ fully implements will flip to `implemented` in W1's own PR, once its tests genui
   Tasks 1-8 (lib/inference/, NOT the sidecar service itself) + all of `TASKS-001`/`002`/`003`.
   Told explicitly not to depend on `fixtures/synthetic-org.json` (W2 owns it) — uses inline
   mocks against `docs/mcp-tool-contract.md`'s documented shapes instead.
-- **W2** (`builder`, branch `block-2/w2-mcp-server`): `mcp/onboarding-context/` (the real MCP
-  server, per the tool contract doc), `fixtures/synthetic-org.json` + its generation prompt,
-  and `services/inference-sidecar/` (per the original approved plan's W2 assignment — not
-  platform-engineer, corrected in `.claude/agents/platform-engineer.md` before launch).
+- **W2 — DONE.** PR #62 opened, reviewed, content approved. Real TDD (confirmed red→green),
+  real end-to-end verification (live stdio MCP client test, live Agent SDK boot smoke test).
+  14-person/140-meeting fabricated org fixture, full 13-week window, all sentiment values
+  present. **Found a real gap:** no wire-contract doc existed for the sidecar's HTTP shape
+  (unlike MCP tools, this wasn't pre-resolved before Block 2 launch) — W2 designed one
+  itself, documented at `services/inference-sidecar/README.md`. Sent the real contract to
+  W1 (still running) via `SendMessage` before it could lock in an independent guess — see
+  decision-log for the full account, including the honest miss on my part.
 - **W3 — DONE.** PR #61 opened, reviewed (posted as a real PR comment), content approved.
   Real verification throughout: `terraform init/validate/plan/apply/destroy` actually run,
   `docker compose up` against postgres+otel-collector genuinely tested (live OTLP trace
