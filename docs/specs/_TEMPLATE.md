@@ -1,6 +1,12 @@
 # SPEC-00N — <Title>
 
-**Status:** draft | approved | amended | superseded
+**Status:** draft | approved | implemented | amended | superseded
+
+`draft`/`approved` — the spec is the source of truth but its tests may not exist yet (normal
+right after merge). `implemented` — flip this once the PR that adds the ACs' real tests
+lands; from that point, `scripts/check-traceability.ts` strictly enforces every traceability
+row resolves to a real, existing test (see the script's header comment for the two-tier
+model). Flipping the status is part of the implementing PR, not a separate step.
 **Owner:** <agent or human>
 **Depends on:** SPEC-00M (if any)
 
@@ -41,5 +47,9 @@ fails the build.
 
 | AC | Behaviour | Test |
 |----|-----------|------|
-| AC-N.1 | <short restatement> | `path/to/test.spec.ts > describe block > test name` |
-| AC-N.2 | <short restatement> | `path/to/test.spec.ts > describe block > test name` |
+| AC-N.1 | <short restatement> | path/to/test.spec.ts > describe block > test name |
+| AC-N.2 | <short restatement> | path/to/test.spec.ts > describe block > test name |
+
+**Do not wrap the Test column in backticks.** `scripts/check-traceability.ts` now strips
+leading/trailing backticks defensively, but write it plain — this table is parsed as data,
+not rendered as code.

@@ -18,8 +18,9 @@ Active specs: none yet — SPEC-000/001/002/003 not started
 
 ## Next 3 actions
 
-1. Launch `architect` to draft `SPEC-000` (inference provider contract) — SPEC-001/002/003
-   depend on its interface, so it goes first
+1. `SPEC-000` (inference provider contract, 11 ACs) drafted, resolved, traceability gate
+   redesigned as two-tier (see decision-log) and verified pass/fail correctly. On branch
+   `spec-000/task-5-inference-provider-contract` — opening its PR now, then merge
 2. `architect` drafts `SPEC-001`/`002`/`003` from issues #2-17, each with numbered ACs and
    traceability tables (tests don't exist yet — that's `builder`'s job in Block 2)
 3. `architect` drafts `PLAN-001..003` (writing-plans skill), `TASKS-*`, and

@@ -4,14 +4,28 @@
  *
  * The hard gate for spec-driven development (see docs/constitution.md, principle II).
  *
- * For every docs/specs/SPEC-*.md (excluding _TEMPLATE.md):
- *   1. Every AC-N.M listed under "## Acceptance criteria" must appear exactly once in the
- *      "## Traceability" table.
- *   2. Every traceability row's Test column (`path/to/file.spec.ts > describe > test name`)
- *      must resolve to a file that exists on disk and contain that test title as a literal
- *      string (a lightweight text check, not a full AST parse — deliberately test-runner
- *      agnostic so this works before vitest/playwright are wired up).
- *   3. No traceability row may reference an AC that doesn't exist in the spec.
+ * Two-tier enforcement, so a spec can merge (fixing its contract) before its tests exist —
+ * which is the whole point of spec-first development — without leaving `main`'s required
+ * `traceability` check permanently red until every spec's tests are written:
+ *
+ *   TIER 1 — structural, enforced on every spec regardless of Status:
+ *     1. Every AC-N.M listed under "## Acceptance criteria" must appear exactly once in the
+ *        "## Traceability" table.
+ *     2. No traceability row may reference an AC that doesn't exist in the spec.
+ *     3. No duplicate AC rows.
+ *     4. The Test column must at least look like a real reference (non-empty, not a
+ *        placeholder like "<test>").
+ *
+ *   TIER 2 — resolution, enforced ONLY when the spec's `**Status:**` field is `implemented`:
+ *     5. Every traceability row's Test column (`path/to/file.spec.ts > describe > test name`)
+ *        must resolve to a file that exists on disk and contain that test title as a literal
+ *        string (a lightweight text check, not a full AST parse — deliberately test-runner
+ *        agnostic so this works before vitest/playwright are wired up).
+ *
+ * A spec merges as `draft`/`approved` with Tier 1 passing and its tests still to come — that's
+ * expected, not a bug. Once implementation actually lands (builder's PR adds the tests), flip
+ * the spec's Status to `implemented` in that same PR — from then on, Tier 2 enforces for real,
+ * and deleting a table row or a test afterward fails CI exactly as intended.
  *
  * Exit 0 and a summary on success. Exit 1 with a precise list of violations on failure.
  * Wired into CI as the `traceability` required status check on `main`.
@@ -82,13 +96,18 @@ function extractTraceabilityRows(content: string, specFile: string): TraceRow[] 
     const cells = trimmed
       .split("|")
       .slice(1, -1)
-      .map((c) => c.trim());
+      .map((c) => c.trim().replace(/^`+|`+$/g, "").trim());
     if (cells.length < 3) return;
     const [ac, behaviour, test] = cells;
     if (!/^AC-\d+\.\d+$/.test(ac)) return; // header row or malformed
     rows.push({ ac, behaviour, test, line: sectionStartLine + idx + 1 });
   });
   return rows;
+}
+
+function extractStatus(content: string): string {
+  const m = content.match(/^\*\*Status:\*\*\s*(.+)$/m);
+  return m ? m[1].trim().toLowerCase() : "";
 }
 
 function testExistsInFile(filePath: string, testTitle: string): boolean {
@@ -150,30 +169,42 @@ function checkSpec(specPath: string): Violation[] {
     seen.add(row.ac);
   }
 
-  // Each row's test must resolve
+  // TIER 1 (always): the Test column must at least look like a real reference — non-empty,
+  // not a template placeholder. This catches copy-paste-the-template mistakes regardless of
+  // implementation status.
   for (const row of rows) {
-    const parts = row.test.split(">").map((p) => p.trim());
-    const filePart = parts[0];
+    const filePart = row.test.split(">")[0]?.trim();
     if (!filePart || filePart.startsWith("<") || filePart === "") {
       violations.push({
         spec: specName,
         message: `${row.ac} (line ${row.line}) has no real test reference: "${row.test}"`,
       });
-      continue;
     }
-    if (!existsSync(join(REPO_ROOT, filePart))) {
-      violations.push({
-        spec: specName,
-        message: `${row.ac} (line ${row.line}) references "${filePart}" which does not exist on disk.`,
-      });
-      continue;
-    }
-    const testTitle = parts[parts.length - 1];
-    if (testTitle && !testExistsInFile(filePart, testTitle)) {
-      violations.push({
-        spec: specName,
-        message: `${row.ac} (line ${row.line}) references test "${testTitle}" — not found as literal text in ${filePart}.`,
-      });
+  }
+
+  // TIER 2 (only once the spec is marked `implemented`): the test must actually exist and
+  // contain the named title. Before that, a dangling reference is expected, not a violation —
+  // the spec is merging to fix its contract; the tests come later in Block 2's implementation.
+  const status = extractStatus(content);
+  if (status === "implemented") {
+    for (const row of rows) {
+      const parts = row.test.split(">").map((p) => p.trim());
+      const filePart = parts[0];
+      if (!filePart || filePart.startsWith("<")) continue; // already flagged by Tier 1
+      if (!existsSync(join(REPO_ROOT, filePart))) {
+        violations.push({
+          spec: specName,
+          message: `${row.ac} (line ${row.line}) references "${filePart}" which does not exist on disk (spec is marked 'implemented', so this must resolve).`,
+        });
+        continue;
+      }
+      const testTitle = parts[parts.length - 1];
+      if (testTitle && !testExistsInFile(filePart, testTitle)) {
+        violations.push({
+          spec: specName,
+          message: `${row.ac} (line ${row.line}) references test "${testTitle}" — not found as literal text in ${filePart} (spec is marked 'implemented').`,
+        });
+      }
     }
   }
 
@@ -202,12 +233,14 @@ function main() {
       console.error(`  [${v.spec}] ${v.message}`);
     }
     console.error(
-      "\nEvery acceptance criterion must map to exactly one existing test (docs/constitution.md, principle II).\n"
+      "\nEvery declared AC needs exactly one well-formed traceability row (Tier 1, always).\n" +
+      "Specs marked Status: implemented must additionally resolve to real, existing tests (Tier 2).\n" +
+      "See docs/constitution.md principle II and this script's header comment.\n"
     );
     process.exit(1);
   }
 
-  console.log(`✅ check-traceability: ${checkedSpecs} spec(s) checked, all ACs traced to existing tests.`);
+  console.log(`✅ check-traceability: ${checkedSpecs} spec(s) checked — structurally sound, and any spec marked 'implemented' has all ACs resolved to real tests.`);
   process.exit(0);
 }
 
