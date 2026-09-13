@@ -17,10 +17,15 @@ fully implements will flip to `implemented` in W1's own PR, once its tests genui
   server, per the tool contract doc), `fixtures/synthetic-org.json` + its generation prompt,
   and `services/inference-sidecar/` (per the original approved plan's W2 assignment — not
   platform-engineer, corrected in `.claude/agents/platform-engineer.md` before launch).
-- **W3** (`platform-engineer`, branch `block-2/w3-platform`): Dockerfile, compose, Terraform,
-  real CI wiring (replacing Block 0's placeholder echo steps), `publish.yml`, observability.
-  Working against documented contracts (Next.js conventions, the npm script names in root
-  `package.json`) since it can't see W1/W2's actual code from its own worktree.
+- **W3 — DONE.** PR #61 opened, reviewed (posted as a real PR comment), content approved.
+  Real verification throughout: `terraform init/validate/plan/apply/destroy` actually run,
+  `docker compose up` against postgres+otel-collector genuinely tested (live OTLP trace
+  POST confirmed), `hadolint`/`actionlint` clean. CI is red on this branch alone for the
+  exactly-expected reason (`app/` doesn't exist yet → `--workspace app` resolves to
+  nothing) — not a defect. **Holding merge until W1 lands**, then re-running CI (should go
+  green once `app/` exists) before merging for real, not bypassing the gate. One
+  integration watch-item: Dockerfile's `COPY .../app/public ./public` will fail if W1
+  doesn't create a `public/` dir (very standard for Next.js, low risk).
 - Each agent was told: don't merge its own PR, don't touch the other worktrees' directories,
   run real verification before opening its PR, and be explicit about what's deferred to
   Block 3 integration vs. genuinely done now.
