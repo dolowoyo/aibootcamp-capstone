@@ -300,3 +300,26 @@ sensibly merge without the other two also existing (SPEC-002 depends on SPEC-001
 issues reference all three).
 
 ---
+
+## 2026-09-13 — MCP tool contract formalized before Block 2 starts
+
+**Context:** `PLAN-003` flagged a real coordination risk — its `mcp-client.ts` interface was
+written against prose in `docs/00-capstone-plan.md`, not a real, tested `mcp/onboarding-context`
+server. Block 2 puts the app-slice builder and the MCP-server builder in separate worktrees,
+working in parallel with no natural sync point until their PRs merge — exactly the setup
+where two independently reasonable guesses diverge.
+
+**Decision:** Wrote `docs/mcp-tool-contract.md` — concrete input/output shapes for
+`list_meetings`, `search_people`, `get_reporting_chain` — as the single authoritative
+reference both builders read before writing code. Split responsibility explicitly: the
+server exposes raw signals only (meetings, people, reporting chain); `lib/stakeholders/
+mcp-client.ts` (app side) owns influence/support derivation, per PLAN-003's own design.
+
+**Why:** Reconciling this after both worktrees have already built independent assumptions
+is strictly more expensive than reconciling it before either starts — the whole point of
+flagging it in Block 1 was to fix it now, not rediscover it as an integration failure in
+Block 3. Not a spec (no ACs, not traceability-enforced) because it's an interface reference
+document, not a testable-behavior spec — named without a `SPEC-` prefix specifically so
+`check-traceability.ts` doesn't try to parse it as one.
+
+---
