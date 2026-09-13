@@ -33,8 +33,17 @@ Active specs: none yet — SPEC-000/001/002/003 not started
   (empty/detached). Not created by this session — likely leftover from another tool on this
   machine (name suggests GitHub Copilot workspace tooling). Not touched; flag to Dele before
   assuming it's safe to remove.
-- Terraform installed via Homebrew per Dele; not yet re-verified on a fresh shell in this
-  session — do that at Block 3 before the first `terraform apply`.
+- **Resolved 2026-09-13:** Terraform was NOT actually installed — `brew install terraform`
+  fails silently/errors because HashiCorp pulled `terraform` from homebrew-core years ago,
+  and re-tapping `hashicorp/tap` fails under current Homebrew's trust policy (unrelated
+  formulas in the same tap — `boundary`, `consul-*` — are rejected as untrusted, which kills
+  the whole tap operation). Installed the official v1.16.2 arm64 binary directly from
+  releases.hashicorp.com instead, with checksum verification, to `/opt/homebrew/bin`.
+  Verified: `terraform version` → `Terraform v1.16.2 on darwin_arm64`, AND
+  `terraform init` against a throwaway `kreuzwerker/docker` provider config succeeded —
+  the actual provider Block 3's IaC will use. See decision-log.
+- Docker daemon is **not currently running** (checked via `docker info`) — not a blocker
+  now, but start Docker Desktop before Block 3's `terraform apply` / `docker compose up`.
 
 ## Do not forget
 

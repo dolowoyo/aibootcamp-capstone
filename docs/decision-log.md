@@ -120,3 +120,33 @@ file, so it wouldn't have reduced what's actually loaded; only genuinely on-dema
 mechanisms (skills, ADRs read when relevant) do that.
 
 ---
+
+## 2026-09-13 — Terraform was never actually installed; installed the binary directly
+
+**Context:** Dele reported running `brew install terraform` before Block 0 began. Verifying
+before Block 1 (`terraform version`) showed it wasn't on PATH at all.
+
+**Decision:** Investigated rather than re-running the same command blindly. Found that
+HashiCorp removed `terraform` from `homebrew-core` some time ago over licensing (BSL) — so
+`brew install terraform` errors out immediately with no formula found, rather than silently
+succeeding. The documented fix, `brew tap hashicorp/tap` then `brew install
+hashicorp/tap/terraform`, also failed: the tap clone itself errors under current Homebrew's
+formula-trust policy, because unrelated formulas in the same tap (`boundary`,
+`consul-enterprise`, etc.) are flagged untrusted and the whole tap operation aborts — not a
+terraform-specific problem, but it blocks reaching terraform's formula regardless.
+
+Installed the official v1.16.2 `darwin_arm64` binary directly from
+`releases.hashicorp.com`, verified against HashiCorp's published SHA256SUMS before use, and
+placed it in `/opt/homebrew/bin` (already on PATH). Verified with `terraform version`.
+
+**Why:** A single retry of the same failing command wastes time without new information;
+the actual failure mode (Homebrew's tap-trust policy rejecting an unrelated formula) was
+worth 5 minutes to understand rather than 30 minutes of trial and error later, closer to
+the Block 3 deadline when Terraform is actually needed. Verifying the download's checksum
+before executing an unsigned binary is table stakes, not optional, even under time pressure.
+
+**Why this matters for the video:** a genuinely reproducible "gotcha" — "I ran the install
+command" turned out not to mean "it's installed," and the assumption would have surfaced at
+the worst possible time (mid-Block-3, with the demo clock running) if not checked now.
+
+---
