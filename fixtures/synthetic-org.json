@@ -1,0 +1,1238 @@
+{
+  "people": [
+    {
+      "id": "p-001",
+      "name": "Dana Whitfield",
+      "title": "Chief Executive Officer",
+      "department": "Executive",
+      "managerId": null,
+      "sentimentSignal": "neutral"
+    },
+    {
+      "id": "p-002",
+      "name": "Marcus Ilori",
+      "title": "Chief Financial Officer",
+      "department": "Finance",
+      "managerId": "p-001",
+      "sentimentSignal": "supportive"
+    },
+    {
+      "id": "p-003",
+      "name": "Priya Shenoy",
+      "title": "Chief Operating Officer",
+      "department": "Operations",
+      "managerId": "p-001",
+      "sentimentSignal": "neutral"
+    },
+    {
+      "id": "p-004",
+      "name": "Renata Okafor",
+      "title": "VP Engineering",
+      "department": "Engineering",
+      "managerId": "p-001",
+      "sentimentSignal": "supportive"
+    },
+    {
+      "id": "p-005",
+      "name": "Tomas Bergstrom",
+      "title": "VP Product",
+      "department": "Product",
+      "managerId": "p-001",
+      "sentimentSignal": "resistant"
+    },
+    {
+      "id": "p-006",
+      "name": "Aisha Kwarteng",
+      "title": "Director of Engineering",
+      "department": "Engineering",
+      "managerId": "p-004",
+      "sentimentSignal": "supportive"
+    },
+    {
+      "id": "p-007",
+      "name": "Lena Vasquez",
+      "title": "Director of Product",
+      "department": "Product",
+      "managerId": "p-005",
+      "sentimentSignal": "resistant"
+    },
+    {
+      "id": "p-008",
+      "name": "Oskar Lindqvist",
+      "title": "Engineering Manager",
+      "department": "Engineering",
+      "managerId": "p-006",
+      "sentimentSignal": "neutral"
+    },
+    {
+      "id": "p-009",
+      "name": "Fatima Al-Sayed",
+      "title": "Engineering Manager",
+      "department": "Engineering",
+      "managerId": "p-006",
+      "sentimentSignal": "supportive"
+    },
+    {
+      "id": "p-010",
+      "name": "Chidi Nwosu",
+      "title": "Staff Engineer",
+      "department": "Engineering",
+      "managerId": "p-008",
+      "sentimentSignal": "neutral"
+    },
+    {
+      "id": "p-011",
+      "name": "Grace Halvorsen",
+      "title": "Senior Engineer",
+      "department": "Engineering",
+      "managerId": "p-009",
+      "sentimentSignal": "supportive"
+    },
+    {
+      "id": "p-012",
+      "name": "Viktor Petrov",
+      "title": "Product Manager",
+      "department": "Product",
+      "managerId": "p-007",
+      "sentimentSignal": "resistant"
+    },
+    {
+      "id": "p-013",
+      "name": "Naledi Dube",
+      "title": "Head of People",
+      "department": "People",
+      "managerId": "p-001",
+      "sentimentSignal": "supportive"
+    },
+    {
+      "id": "p-014",
+      "name": "Soren Kessler",
+      "title": "Principal Architect",
+      "department": "Engineering",
+      "managerId": "p-004",
+      "sentimentSignal": "neutral"
+    }
+  ],
+  "meetings": [
+    {
+      "id": "m-0137",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": -12,
+      "date": "2026-06-16T15:15:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0134",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -12,
+      "date": "2026-06-17T10:00:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0133",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -12,
+      "date": "2026-06-17T11:00:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0138",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": -12,
+      "date": "2026-06-17T11:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0135",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -12,
+      "date": "2026-06-17T12:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0139",
+      "personId": "p-013",
+      "personName": "Naledi Dube",
+      "weekOffset": -12,
+      "date": "2026-06-17T12:30:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0136",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -12,
+      "date": "2026-06-17T13:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0140",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": -12,
+      "date": "2026-06-17T15:00:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0129",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": -11,
+      "date": "2026-06-22T12:30:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0124",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -11,
+      "date": "2026-06-22T12:45:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0128",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": -11,
+      "date": "2026-06-23T09:00:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0130",
+      "personId": "p-011",
+      "personName": "Grace Halvorsen",
+      "weekOffset": -11,
+      "date": "2026-06-23T13:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0123",
+      "personId": "p-001",
+      "personName": "Dana Whitfield",
+      "weekOffset": -11,
+      "date": "2026-06-23T15:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0125",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -11,
+      "date": "2026-06-24T15:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0127",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -11,
+      "date": "2026-06-25T11:00:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0126",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -11,
+      "date": "2026-06-25T12:30:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0131",
+      "personId": "p-013",
+      "personName": "Naledi Dube",
+      "weekOffset": -11,
+      "date": "2026-06-26T09:00:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0132",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": -11,
+      "date": "2026-06-26T15:15:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0112",
+      "personId": "p-001",
+      "personName": "Dana Whitfield",
+      "weekOffset": -10,
+      "date": "2026-06-29T12:00:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0120",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": -10,
+      "date": "2026-06-30T10:15:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0116",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -10,
+      "date": "2026-07-01T10:00:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0118",
+      "personId": "p-007",
+      "personName": "Lena Vasquez",
+      "weekOffset": -10,
+      "date": "2026-07-01T11:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0113",
+      "personId": "p-003",
+      "personName": "Priya Shenoy",
+      "weekOffset": -10,
+      "date": "2026-07-01T14:15:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0114",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -10,
+      "date": "2026-07-02T09:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0117",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -10,
+      "date": "2026-07-02T10:45:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0119",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": -10,
+      "date": "2026-07-02T11:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0121",
+      "personId": "p-012",
+      "personName": "Viktor Petrov",
+      "weekOffset": -10,
+      "date": "2026-07-02T13:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0122",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": -10,
+      "date": "2026-07-03T11:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0115",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -10,
+      "date": "2026-07-03T13:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0111",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": -9,
+      "date": "2026-07-06T09:00:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0108",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": -9,
+      "date": "2026-07-06T13:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0102",
+      "personId": "p-003",
+      "personName": "Priya Shenoy",
+      "weekOffset": -9,
+      "date": "2026-07-07T14:00:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0106",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -9,
+      "date": "2026-07-08T11:45:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0107",
+      "personId": "p-007",
+      "personName": "Lena Vasquez",
+      "weekOffset": -9,
+      "date": "2026-07-08T12:45:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0104",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -9,
+      "date": "2026-07-08T14:30:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0103",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -9,
+      "date": "2026-07-09T11:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0110",
+      "personId": "p-011",
+      "personName": "Grace Halvorsen",
+      "weekOffset": -9,
+      "date": "2026-07-09T13:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0105",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -9,
+      "date": "2026-07-10T10:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0109",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": -9,
+      "date": "2026-07-10T11:30:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0100",
+      "personId": "p-011",
+      "personName": "Grace Halvorsen",
+      "weekOffset": -8,
+      "date": "2026-07-13T15:00:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0101",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": -8,
+      "date": "2026-07-14T14:15:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0094",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -8,
+      "date": "2026-07-15T09:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0091",
+      "personId": "p-001",
+      "personName": "Dana Whitfield",
+      "weekOffset": -8,
+      "date": "2026-07-15T12:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0098",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": -8,
+      "date": "2026-07-15T13:45:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0095",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -8,
+      "date": "2026-07-15T14:00:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0096",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -8,
+      "date": "2026-07-15T15:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0092",
+      "personId": "p-002",
+      "personName": "Marcus Ilori",
+      "weekOffset": -8,
+      "date": "2026-07-16T09:30:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0097",
+      "personId": "p-007",
+      "personName": "Lena Vasquez",
+      "weekOffset": -8,
+      "date": "2026-07-17T09:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0093",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -8,
+      "date": "2026-07-17T10:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0099",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": -8,
+      "date": "2026-07-17T15:45:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0084",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -7,
+      "date": "2026-07-20T09:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0088",
+      "personId": "p-010",
+      "personName": "Chidi Nwosu",
+      "weekOffset": -7,
+      "date": "2026-07-20T15:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0081",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -7,
+      "date": "2026-07-21T09:15:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0089",
+      "personId": "p-011",
+      "personName": "Grace Halvorsen",
+      "weekOffset": -7,
+      "date": "2026-07-22T09:30:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0085",
+      "personId": "p-007",
+      "personName": "Lena Vasquez",
+      "weekOffset": -7,
+      "date": "2026-07-22T13:15:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0082",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -7,
+      "date": "2026-07-23T10:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0083",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -7,
+      "date": "2026-07-23T12:00:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0087",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": -7,
+      "date": "2026-07-23T12:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0090",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": -7,
+      "date": "2026-07-24T09:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0080",
+      "personId": "p-002",
+      "personName": "Marcus Ilori",
+      "weekOffset": -7,
+      "date": "2026-07-24T12:30:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0086",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": -7,
+      "date": "2026-07-24T14:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0073",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -6,
+      "date": "2026-07-27T09:00:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0068",
+      "personId": "p-003",
+      "personName": "Priya Shenoy",
+      "weekOffset": -6,
+      "date": "2026-07-27T10:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0078",
+      "personId": "p-013",
+      "personName": "Naledi Dube",
+      "weekOffset": -6,
+      "date": "2026-07-27T12:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0070",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -6,
+      "date": "2026-07-27T13:00:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0072",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -6,
+      "date": "2026-07-27T14:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0079",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": -6,
+      "date": "2026-07-28T09:30:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0071",
+      "personId": "p-005",
+      "personName": "Tomas Bergstrom",
+      "weekOffset": -6,
+      "date": "2026-07-28T14:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0076",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": -6,
+      "date": "2026-07-28T14:30:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0074",
+      "personId": "p-007",
+      "personName": "Lena Vasquez",
+      "weekOffset": -6,
+      "date": "2026-07-28T15:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0075",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": -6,
+      "date": "2026-07-30T09:30:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0077",
+      "personId": "p-010",
+      "personName": "Chidi Nwosu",
+      "weekOffset": -6,
+      "date": "2026-07-30T12:45:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0069",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -6,
+      "date": "2026-07-30T15:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0067",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": -5,
+      "date": "2026-08-03T09:15:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0063",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -5,
+      "date": "2026-08-04T15:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0065",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": -5,
+      "date": "2026-08-05T12:00:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0058",
+      "personId": "p-001",
+      "personName": "Dana Whitfield",
+      "weekOffset": -5,
+      "date": "2026-08-05T14:30:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0064",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": -5,
+      "date": "2026-08-06T14:00:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0066",
+      "personId": "p-013",
+      "personName": "Naledi Dube",
+      "weekOffset": -5,
+      "date": "2026-08-06T14:30:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0060",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -5,
+      "date": "2026-08-06T15:15:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0062",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -5,
+      "date": "2026-08-06T15:30:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0061",
+      "personId": "p-005",
+      "personName": "Tomas Bergstrom",
+      "weekOffset": -5,
+      "date": "2026-08-07T11:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0059",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -5,
+      "date": "2026-08-07T14:15:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0053",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": -4,
+      "date": "2026-08-10T09:00:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0050",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -4,
+      "date": "2026-08-10T14:00:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0049",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -4,
+      "date": "2026-08-10T15:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0055",
+      "personId": "p-011",
+      "personName": "Grace Halvorsen",
+      "weekOffset": -4,
+      "date": "2026-08-11T11:15:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0048",
+      "personId": "p-005",
+      "personName": "Tomas Bergstrom",
+      "weekOffset": -4,
+      "date": "2026-08-12T09:00:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0047",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -4,
+      "date": "2026-08-12T10:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0046",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -4,
+      "date": "2026-08-12T11:15:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0051",
+      "personId": "p-007",
+      "personName": "Lena Vasquez",
+      "weekOffset": -4,
+      "date": "2026-08-13T12:00:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0045",
+      "personId": "p-003",
+      "personName": "Priya Shenoy",
+      "weekOffset": -4,
+      "date": "2026-08-13T12:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0054",
+      "personId": "p-010",
+      "personName": "Chidi Nwosu",
+      "weekOffset": -4,
+      "date": "2026-08-13T13:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0052",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": -4,
+      "date": "2026-08-13T14:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0057",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": -4,
+      "date": "2026-08-14T13:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0056",
+      "personId": "p-013",
+      "personName": "Naledi Dube",
+      "weekOffset": -4,
+      "date": "2026-08-14T15:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0042",
+      "personId": "p-010",
+      "personName": "Chidi Nwosu",
+      "weekOffset": -3,
+      "date": "2026-08-17T09:30:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0035",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -3,
+      "date": "2026-08-17T13:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0044",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": -3,
+      "date": "2026-08-18T12:30:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0036",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -3,
+      "date": "2026-08-18T12:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0038",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -3,
+      "date": "2026-08-19T13:45:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0040",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": -3,
+      "date": "2026-08-19T15:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0043",
+      "personId": "p-013",
+      "personName": "Naledi Dube",
+      "weekOffset": -3,
+      "date": "2026-08-20T10:15:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0041",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": -3,
+      "date": "2026-08-20T11:45:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0039",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -3,
+      "date": "2026-08-21T13:45:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0037",
+      "personId": "p-005",
+      "personName": "Tomas Bergstrom",
+      "weekOffset": -3,
+      "date": "2026-08-21T14:00:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0025",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -2,
+      "date": "2026-08-24T09:30:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0033",
+      "personId": "p-011",
+      "personName": "Grace Halvorsen",
+      "weekOffset": -2,
+      "date": "2026-08-24T13:00:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0032",
+      "personId": "p-010",
+      "personName": "Chidi Nwosu",
+      "weekOffset": -2,
+      "date": "2026-08-24T13:15:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0023",
+      "personId": "p-001",
+      "personName": "Dana Whitfield",
+      "weekOffset": -2,
+      "date": "2026-08-24T15:15:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0026",
+      "personId": "p-005",
+      "personName": "Tomas Bergstrom",
+      "weekOffset": -2,
+      "date": "2026-08-25T11:00:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0031",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": -2,
+      "date": "2026-08-25T11:15:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0028",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -2,
+      "date": "2026-08-26T11:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0030",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": -2,
+      "date": "2026-08-26T13:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0027",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -2,
+      "date": "2026-08-26T15:00:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0029",
+      "personId": "p-007",
+      "personName": "Lena Vasquez",
+      "weekOffset": -2,
+      "date": "2026-08-27T11:15:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0024",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -2,
+      "date": "2026-08-28T10:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0034",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": -2,
+      "date": "2026-08-28T12:00:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0012",
+      "personId": "p-002",
+      "personName": "Marcus Ilori",
+      "weekOffset": -1,
+      "date": "2026-08-31T09:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0013",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -1,
+      "date": "2026-08-31T14:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0017",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -1,
+      "date": "2026-09-01T12:45:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0016",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": -1,
+      "date": "2026-09-01T13:15:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0019",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": -1,
+      "date": "2026-09-01T14:45:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0021",
+      "personId": "p-013",
+      "personName": "Naledi Dube",
+      "weekOffset": -1,
+      "date": "2026-09-02T10:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0018",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": -1,
+      "date": "2026-09-02T12:15:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0014",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": -1,
+      "date": "2026-09-03T10:30:00.000Z",
+      "durationMinutes": 60
+    },
+    {
+      "id": "m-0022",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": -1,
+      "date": "2026-09-03T15:15:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0020",
+      "personId": "p-010",
+      "personName": "Chidi Nwosu",
+      "weekOffset": -1,
+      "date": "2026-09-04T09:45:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0015",
+      "personId": "p-005",
+      "personName": "Tomas Bergstrom",
+      "weekOffset": -1,
+      "date": "2026-09-04T12:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0001",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": 0,
+      "date": "2026-09-07T12:15:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0008",
+      "personId": "p-009",
+      "personName": "Fatima Al-Sayed",
+      "weekOffset": 0,
+      "date": "2026-09-07T12:30:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0004",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": 0,
+      "date": "2026-09-07T12:45:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0003",
+      "personId": "p-005",
+      "personName": "Tomas Bergstrom",
+      "weekOffset": 0,
+      "date": "2026-09-08T10:30:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0010",
+      "personId": "p-012",
+      "personName": "Viktor Petrov",
+      "weekOffset": 0,
+      "date": "2026-09-08T11:00:00.000Z",
+      "durationMinutes": 45
+    },
+    {
+      "id": "m-0009",
+      "personId": "p-011",
+      "personName": "Grace Halvorsen",
+      "weekOffset": 0,
+      "date": "2026-09-08T14:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0005",
+      "personId": "p-006",
+      "personName": "Aisha Kwarteng",
+      "weekOffset": 0,
+      "date": "2026-09-09T09:15:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0007",
+      "personId": "p-008",
+      "personName": "Oskar Lindqvist",
+      "weekOffset": 0,
+      "date": "2026-09-09T14:15:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0006",
+      "personId": "p-007",
+      "personName": "Lena Vasquez",
+      "weekOffset": 0,
+      "date": "2026-09-10T12:00:00.000Z",
+      "durationMinutes": 15
+    },
+    {
+      "id": "m-0011",
+      "personId": "p-014",
+      "personName": "Soren Kessler",
+      "weekOffset": 0,
+      "date": "2026-09-11T09:45:00.000Z",
+      "durationMinutes": 30
+    },
+    {
+      "id": "m-0002",
+      "personId": "p-004",
+      "personName": "Renata Okafor",
+      "weekOffset": 0,
+      "date": "2026-09-11T12:00:00.000Z",
+      "durationMinutes": 60
+    }
+  ]
+}
