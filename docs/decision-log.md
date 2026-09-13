@@ -150,3 +150,28 @@ command" turned out not to mean "it's installed," and the assumption would have 
 the worst possible time (mid-Block-3, with the demo clock running) if not checked now.
 
 ---
+
+## 2026-09-13 — None of the 7 agent definitions could actually invoke a skill
+
+**Context:** Starting Block 1, about to launch `product-owner` to run the `brainstorming`
+skill per CLAUDE.md rule #2. Checked each agent definition's frontmatter `tools:` list before
+launching and found none of the seven granted the `Skill` tool — only `Read`, `Write`,
+`Edit`, `Bash`, `Grep`, `Glob`, `WebFetch` in various combinations.
+
+**Decision:** Added `Skill` to every agent's tool list before running any of them.
+
+**Why:** The entire agent design in `.claude/agents/*.md` is built around each agent invoking
+a specific bound superpowers skill for its phase (brainstorming, writing-plans,
+test-driven-development, etc. — see `CLAUDE.md`'s bound-skills table). Without `Skill` in
+its tool grant, an agent literally cannot call `Skill()` — it would either fail outright or
+silently improvise the phase instead, which is precisely the failure mode the whole binding
+was designed to prevent. This would have surfaced the first time any agent actually ran,
+and might have looked like the agent "ignoring" its instructions rather than being unable
+to follow them — a much harder failure to diagnose after the fact than to prevent up front.
+
+**Why this matters for the video:** writing an agent's *instructions* to use a skill and
+granting the *capability* to use it are two different steps, and it's easy to do the first
+without the second — a genuine, specific finding about building multi-agent systems, not a
+generic "always check your config" moral.
+
+---
