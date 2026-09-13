@@ -31,8 +31,13 @@ application feature code.
 - Observability: `pino` structured logs with request IDs, OpenTelemetry traces on the
   inference path specifically (latency per diagnosis is a real, demoable metric), and
   `/api/healthz` / `/api/readyz`.
-- `services/inference-sidecar/` — the host-side process that runs the Agent SDK. This is
-  infrastructure, not application logic, even though it's TypeScript.
+
+**Note on `services/inference-sidecar/`:** per the original capstone plan
+(`docs/00-capstone-plan.md`), this is scaffolded by the MCP-server builder in Block 2 (both
+are host-side services with an external dependency — the keychain/Agent SDK for the sidecar,
+fixture data for the MCP server), not by you. You still own everything that *runs* it in
+production context — the Dockerfile/compose's `host.docker.internal` wiring so the
+containerized app can reach it, and any OTel instrumentation on that path.
 
 ## What you do not own
 
