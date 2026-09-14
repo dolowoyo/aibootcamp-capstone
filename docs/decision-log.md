@@ -490,3 +490,28 @@ a lot of it is the written instructions an agent reads directly, not only the to
 formally invokes a packaged skill.
 
 ---
+
+## 2026-09-13 — Block 2's screen capture was never recorded; live footage cannot be recovered
+
+**Context:** Restarting the session ahead of Block 3, Dele asked to first run the app to see
+Block 2's state and separately flagged that the plan's screen-recording step for Block 2
+("this is the b-roll you cannot recreate afterward") never happened — no QuickTime capture
+was running while the three worktrees/agents built in parallel.
+
+**Decision:** The live Block 2 footage is gone and will not be faked as original footage.
+Two concrete responses instead: (1) re-enact one short, real segment of the multi-agent
+worktree workflow — driven against genuine outstanding work (e.g. the `/api/readyz` gap),
+not a scripted fake — with Dele recording live so the video has honest b-roll, clearly
+distinct from a claim that it's the original Block 2 run; (2) Block 3 (integration) will be
+recorded live from the start so it doesn't repeat the gap.
+
+**Why:** Recreating "Block 2 exactly as it happened" isn't possible or honest — the merged
+PRs, decision log, and git history are the real record of that block. Best move is to be
+transparent about the miss and make sure the same mistake doesn't recur in Block 3, rather
+than manufacturing footage that misrepresents when it was captured.
+
+**Alternative considered:** Rely solely on static artifacts (PRs, decision-log, git log) for
+the video's Block 2 beat with no re-enactment footage at all — rejected only insofar as
+Dele asked for a short re-enactment in addition, not instead.
+
+---
