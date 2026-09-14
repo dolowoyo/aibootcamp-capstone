@@ -1,0 +1,69 @@
+name: aibootcamp-capstone
+
+# Local dev / demo stack: app + postgres 16 + otel-collector.
+#
+# Inference: LLM_PROVIDER defaults to `fixture` (no host process needed to bring this
+# stack up at all). Set LLM_PROVIDER=sidecar to route the app's inference calls to a
+# host-side `services/inference-sidecar` process (docs/adr/0001-inference-boundary.md) —
+# that process is NOT part of this compose file by design: the Agent SDK it wraps
+# authenticates via the macOS keychain + `claude` CLI subprocess, neither of which exists
+# inside a container. Run it separately on the host: `node services/inference-sidecar/index.js`.
+# `extra_hosts` below is what makes `host.docker.internal:8787` resolve from inside the
+# app container back to that host process.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      LLM_PROVIDER: ${LLM_PROVIDER:-fixture}
+      SIDECAR_URL: http://host.docker.internal:8787
+      DATABASE_URL: postgresql://first90:first90@postgres:5432/first90?schema=public
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      NODE_ENV: production
+    extra_hosts:
+      # Docker Desktop on macOS resolves this automatically; kept explicit for parity
+      # with Linux hosts where it must be declared (host-gateway).
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: first90
+      POSTGRES_PASSWORD: first90
+      POSTGRES_DB: first90
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U first90 -d first90"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.108.0
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+
+volumes:
+  postgres-data:

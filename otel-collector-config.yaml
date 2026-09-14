@@ -1,0 +1,37 @@
+# Minimal OpenTelemetry Collector config for local dev (docker-compose.yml).
+#
+# Receives OTLP traces from the app (instrumented on the inference path specifically —
+# see docs/observability.md for exact instrumentation points) and logs them to the
+# collector's own stdout via the `debug` exporter. This is intentionally the simplest
+# possible sink for a local/demo setup: no external backend (Jaeger, Honeycomb, etc.) is
+# wired up because none is available without a cloud account (see docs/adr/0003-local-iac.md's
+# no-cloud-account constraint) — `docker compose logs otel-collector` is the viewer.
+#
+# Swapping the `debug` exporter for a real backend later is a one-line change here; the
+# app-side instrumentation does not need to change.
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch: {}
+
+exporters:
+  debug:
+    verbosity: detailed
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]
