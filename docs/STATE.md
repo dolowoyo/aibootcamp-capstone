@@ -1,82 +1,82 @@
-# Current State — updated 2026-09-14T00:10Z (Block 2 in progress — the parallel build)
+# Current State — updated 2026-09-14T00:35Z (Block 2 COMPLETE)
 
-Block: 2 (parallel worktree build) — 3 agents launched in parallel, each in its own
-harness-managed worktree (`isolation: "worktree"` on the Agent tool — the native mechanism,
-per the `using-git-worktrees` skill, not manual `git worktree add`). Running in background.
+Block: 2 (parallel worktree build) — **complete.** All 3 PRs merged, CI genuinely green on
+`main`, all worktrees and stale branches cleaned up. Ready for Block 3 (integration).
 
-Active specs: `SPEC-000`/`001`/`002`/`003` all merged, Status: approved. Whichever specs W1
-fully implements will flip to `implemented` in W1's own PR, once its tests genuinely exist.
+Active specs: `SPEC-000`/`001`/`002`/`003` all merged, all now `Status: implemented`
+(flipped by W1 once real tests existed) — Tier 2 traceability genuinely passing for all four.
 
 ## In flight
 
-- **W1** (`builder`, branch `block-2/w1-app-slice`): Next.js 15 app scaffold + `TASKS-000`
-  Tasks 1-8 (lib/inference/, NOT the sidecar service itself) + all of `TASKS-001`/`002`/`003`.
-  Told explicitly not to depend on `fixtures/synthetic-org.json` (W2 owns it) — uses inline
-  mocks against `docs/mcp-tool-contract.md`'s documented shapes instead.
-- **W2 — DONE.** PR #62 opened, reviewed, content approved. Real TDD (confirmed red→green),
-  real end-to-end verification (live stdio MCP client test, live Agent SDK boot smoke test).
-  14-person/140-meeting fabricated org fixture, full 13-week window, all sentiment values
-  present. **Found a real gap:** no wire-contract doc existed for the sidecar's HTTP shape
-  (unlike MCP tools, this wasn't pre-resolved before Block 2 launch) — W2 designed one
-  itself, documented at `services/inference-sidecar/README.md`. Sent the real contract to
-  W1 (still running) via `SendMessage` before it could lock in an independent guess — see
-  decision-log for the full account, including the honest miss on my part.
-- **W3 — DONE.** PR #61 opened, reviewed (posted as a real PR comment), content approved.
-  Real verification throughout: `terraform init/validate/plan/apply/destroy` actually run,
-  `docker compose up` against postgres+otel-collector genuinely tested (live OTLP trace
-  POST confirmed), `hadolint`/`actionlint` clean. CI is red on this branch alone for the
-  exactly-expected reason (`app/` doesn't exist yet → `--workspace app` resolves to
-  nothing) — not a defect. **Holding merge until W1 lands**, then re-running CI (should go
-  green once `app/` exists) before merging for real, not bypassing the gate. One
-  integration watch-item: Dockerfile's `COPY .../app/public ./public` will fail if W1
-  doesn't create a `public/` dir (very standard for Next.js, low risk).
-- Each agent was told: don't merge its own PR, don't touch the other worktrees' directories,
-  run real verification before opening its PR, and be explicit about what's deferred to
-  Block 3 integration vs. genuinely done now.
-- Root `package.json` already declares npm workspaces (`app`, `services/*`, `mcp/*`) and the
-  shared script contract (`lint`/`typecheck`/`test`/`build`/`test:e2e`) all three build
-  against — set up before launch specifically so this didn't become a 3-way coordination
-  problem mid-flight.
+- **W1 (app slice) — merged, PR #63.** Next.js 15 app + full `lib/inference/` (minus the
+  sidecar service) + `lib/stars/` + `lib/plan/` + `lib/stakeholders/`. 39 tests. Correctly
+  applied a mid-flight sidecar-contract correction relayed from W2.
+- **W2 (MCP server + sidecar) — merged, PR #62.** `mcp/onboarding-context/` (13 tests),
+  `services/inference-sidecar/` (13 tests), `fixtures/synthetic-org.json` + generation
+  prompt. Designed the sidecar's HTTP wire contract itself (no doc existed) and documented
+  it — this became the one W1 was corrected against.
+- **W3 (platform) — merged, PR #61.** Dockerfile, docker-compose.yml, Terraform
+  (`kreuzwerker/docker`), real CI wiring, `publish.yml`, `docs/observability.md`.
+- **Merge order:** W1 → W3 → W2, each verified with real commands (not trusted CI badges
+  blindly) before merging. `main`'s CI is genuinely green — confirmed independently across
+  all four workspaces (app/lib: 39 tests, mcp: 13, sidecar: 13 — 65 total, all real).
 
-Prior blocks, for context: Block 0 (foundation/scaffolding) and Block 1 (all 4 specs + plans
-+ tasks + ADRs) are both fully merged to `main`. 57 issues filed, Project board current.
-Full history in git log and `docs/decision-log.md` — not repeated here since this file is a
-snapshot, not an archive.
+## Real findings from this block (full detail in decision-log.md)
+
+- **Two bugs in the traceability gate's own design**, caught before the first spec merged:
+  a backtick-parsing bug, and the two-tier enforcement model (specs merge before their tests
+  exist; `Status: implemented` activates strict test-resolution per spec).
+- **None of the 7 agent definitions had the `Skill` tool granted** — fixed before Block 2
+  launched. (One open thread: W1 still reported `Skill` unavailable at runtime despite the
+  frontmatter fix — the written instructions were followed faithfully regardless, but the
+  literal tool-grant mechanism is worth investigating further, not fully diagnosed.)
+- **`.claude/worktrees/` was never gitignored** before first real worktree use — caught and
+  fixed; nothing was ever committed.
+- **A sidecar HTTP wire-contract gap** — pre-resolved the MCP tool contract before launch,
+  missed doing the same for the sidecar. W2 designed one under real pressure; relayed to W1
+  mid-flight via `SendMessage` before it could diverge independently.
+- **PR #63's green CI checks were misleading** — its branch predated W3's real CI wiring,
+  so it ran stale placeholder `echo` steps. Verified manually instead of trusting the badge.
+- **Two real container integration bugs**, found by actually building and running the
+  container before merging W3: `next.config.ts` never set `output: "standalone"` despite a
+  comment claiming it did; the Dockerfile assumed a per-workspace `app/node_modules` that npm
+  hoisting never creates, and assumed a flat `server.js` path that the monorepo's
+  `outputFileTracingRoot` actually nests under `app/`.
+- **A cross-worktree zod version conflict** (app wanted v3, MCP server independently chose
+  v4) — invisible until both workspaces' dependencies were combined in one install. Aligned
+  to v3 (already proven, no code changes needed).
+- **The Project board was only updated in batch, after work landed**, not live as it
+  happened — Dele flagged this. Added a concrete board-sync rule (with real project/field/
+  option IDs) to `capstone-conventions`, wired into every implementation-facing agent's
+  working rules, and added as a `/checkpoint` safety-net step.
 
 ## Next 3 actions
 
-1. Wait for all 3 agents to report back (background notifications) — do not poll or guess
-   their results in the meantime
-2. Review each PR: run `check-traceability`, confirm CI, check for scope/contract drift
-   (especially the MCP tool contract — flagged explicitly to W2 to update the doc if it
-   changes anything)
-3. Merge in a sensible order (likely W2 MCP/sidecar and W3 platform first, since W1's app
-   is the one most likely to need both), then start Block 3 (integration)
+1. Start Block 3 (integration): wire the sidecar → app end-to-end with real Agent SDK
+   inference; add the missing `/api/readyz` route (compose references it, only `healthz`
+   exists); seed a coherent demo persona
+2. Run the full verification checklist from `docs/00-capstone-plan.md` — `terraform apply`
+   the real stack, `docker compose up` end-to-end including the app container
+3. Address the dev-dependency vulnerabilities `npm audit` flagged (vitest/vite/esbuild/
+   prisma toolchain, not runtime deps) — low priority, `npm audit fix` pass
 
 ## Blockers / open decisions
 
-- **Resolved:** branch protection required 1 approving review; dropped to CI-checks-only
-  after self-approval couldn't be verified safely on this solo repo (`gh`'s own classifier
-  blocked the test). Merge gate: 6 required status checks, no review-count requirement.
-- **Unexplained, not touched:** `git worktree list` shows a second worktree at
-  `../copilot-worktrees/aibootcamp-capstone/dolowoyo-studious-guacamole` at commit
-  `0000000` (empty/detached). Not created by this session. Flag to Dele before assuming
-  it's safe to remove.
-- **Resolved:** Terraform wasn't actually installed (`brew install terraform` doesn't work
-  post-BSL-license-change, and `hashicorp/tap` fails under current Homebrew's trust policy).
-  Installed v1.16.2 arm64 binary directly, checksum-verified, confirmed working against the
-  real `kreuzwerker/docker` provider.
-- **Resolved before Block 2 launch:** the MCP tool contract coordination risk flagged in
-  Block 1 — `docs/mcp-tool-contract.md` now exists as the shared source of truth for W1 and
-  W2 to build against independently without guessing at each other.
-- Docker daemon **not currently running** — start Docker Desktop before Block 3's
-  `docker compose up` / real `terraform apply` against a pulled image.
+- **Unexplained, not touched:** stray `copilot-worktrees/.../dolowoyo-studious-guacamole`
+  worktree at commit `0000000` — still present, still ignored, not created by this session.
+- Docker daemon: **running** (Colima) as of this checkpoint — used for real verification
+  during Block 2's merge sequence. Confirm still running at the start of Block 3.
+- Terraform v1.16.2 confirmed working at `/opt/homebrew/bin/terraform`.
+- **Open, not fully diagnosed:** why W1 reported the `Skill` tool unavailable despite the
+  frontmatter grant. Worth investigating before Block 3 if there's time, since Block 3 will
+  also run agents expected to invoke bound skills.
 
 ## Do not forget
 
-- `check-traceability.ts`'s two-tier model: a spec's `Status:` flips to `implemented` only
-  once its real tests exist — that's W1's job for SPEC-001/002/003, in the same PR.
-- If a subagent needs to inspect the broken `copilot-worktrees` worktree, `git status`
-  inside it can hang — use `ls` to probe it instead.
-- **Screen recording should be running now if it wasn't already** — this parallel-build
-  moment is the b-roll that can't be recreated after merging.
+- `check-traceability.ts`'s two-tier model: all 4 specs are now `implemented` — any future
+  PR that breaks a traceability row or deletes a test will now fail CI for real, on any spec.
+- The Project board sync rule is now a documented working rule, not tribal knowledge — see
+  `capstone-conventions`'s board-sync section for the exact commands/IDs before any future
+  agent work that touches issues.
+- 65 real tests pass across 4 workspaces, verified independently by the orchestrator, not
+  just claimed by the agents that wrote them.
