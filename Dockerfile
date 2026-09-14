@@ -42,11 +42,29 @@ COPY . .
 ENV LLM_PROVIDER=fixture
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Generate the Prisma client before building. `npm ci` alone doesn't do this -- there's no
+# postinstall hook wiring it up, only the manual `prisma:generate` script (app/package.json)
+# -- so without this step `next build`'s standalone output traces a @prisma/client that was
+# never generated, and the runtime fails with "did not initialize yet" the moment any route
+# (e.g. /api/readyz) actually imports it. Found by running the built image for real.
+RUN npx prisma generate --schema=./app/prisma/schema.prisma
+
 RUN npm run build --workspace app
 
 # ---- runner: minimal, non-root production image ---------------------------------------
 FROM node:${NODE_VERSION} AS runner
-WORKDIR /app
+# Must match the builder stage's WORKDIR (/repo), not just its own convenience path. Some
+# server-side code resolves data files at runtime via `__dirname`-relative math (e.g.
+# lib/inference/adapters/fixture.ts's fixtures/ lookup); Next's file tracer copies those
+# files into the standalone output preserving their path *relative* to the monorepo root,
+# but doesn't rewrite the compiled bundle's own idea of its absolute location -- that stays
+# frozen to wherever `next build` ran (the builder stage's /repo). If the runner stage's
+# WORKDIR differs, the copied files are relatively correct but sit under the wrong absolute
+# prefix, so a runtime `__dirname`-based lookup ENOENTs on the build-time path. Found by
+# running the built image for real: /api/diagnosis failed with "ENOENT: no such file or
+# directory, scandir '/repo/fixtures/inference/stars'" even though the equivalent files were
+# actually present at /app/fixtures/inference/stars under the old (mismatched) WORKDIR.
+WORKDIR /repo
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -60,7 +78,7 @@ ENV LLM_PROVIDER=fixture
 
 # Non-root runtime user. `node:alpine` already ships a `node` user/group (uid/gid 1000);
 # reuse it rather than inventing a new one.
-RUN mkdir -p /app/.next && chown -R node:node /app
+RUN mkdir -p /repo/app/.next && chown -R node:node /repo
 
 # Standalone output contract: `.next/standalone` contains a self-executing `server.js`
 # plus a pruned node_modules; `.next/static` and `public/` are not included in
