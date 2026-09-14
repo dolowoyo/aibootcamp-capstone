@@ -420,3 +420,33 @@ the only way to catch it is to actually run the whole thing together, not just e
 alone.
 
 ---
+
+## 2026-09-14 — Cross-worktree zod version conflict surfaced during merge
+
+**Context:** Merging `main` (which has W1's app code, `zod ^3.24.1`) into W2's branch
+(MCP server + sidecar) before merging PR #62, then regenerating `package-lock.json` to
+resolve the conflict, revealed a real build failure: `mcp/onboarding-context` had
+independently declared `zod ^4.6.4`. Each worktree chose a reasonable version in isolation;
+neither could see the other's choice.
+
+**Finding:** `@modelcontextprotocol/sdk@^1.30.0`'s tool-registration API expects zod v3's
+`ZodType` shape. Once both workspaces' dependencies were combined in one npm install (via
+workspace hoisting), TypeScript failed to compile `mcp/onboarding-context/src/server.ts`
+against the v4-shaped `ZodNumber`/`ZodString` types. This was invisible in each worktree
+alone — W2's own `npm ci`, in its own isolated worktree, never saw `app`'s zod v3 at all.
+
+**Decision:** Aligned `mcp/onboarding-context`'s zod dependency to `^3.24.1`, matching
+`app`'s already-proven range. The actual zod usage in the MCP server (`z.string()`,
+`z.number()`, `.describe()`) has no version-specific API, so this was a safe, code-free fix.
+Verified with a full clean reinstall and re-run of every workspace's build/test suite.
+
+**Why this matters for the video:** a second, distinct flavor of the same underlying lesson
+as the Dockerfile/next.config.ts findings — three agents built correct code in isolation,
+and the SDD process (specs, contracts, traceability) caught the *behavioral* risks well, but
+dependency-version drift across parallel worktrees is a class of integration risk that no
+amount of spec rigor prevents on its own. It only surfaces when the trees actually merge.
+Worth naming as a concrete "what I'd do differently": a shared dependency-version policy
+(or at least a shared `package.json` `overrides` field) declared in Block 0, before Block 2's
+worktrees fork, would have prevented this rather than requiring it to be caught at merge time.
+
+---
