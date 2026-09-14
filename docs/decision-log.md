@@ -515,3 +515,65 @@ the video's Block 2 beat with no re-enactment footage at all — rejected only i
 Dele asked for a short re-enactment in addition, not instead.
 
 ---
+
+## 2026-09-14 — Live sidecar wiring surfaced three real bugs no mocked test could catch
+
+**Context:** Block 3's core integration task — running the sidecar adapter
+(`lib/inference/adapters/sidecar.ts`) against a real, running `services/inference-sidecar`
+process backed by a genuine `claude-agent-sdk` call, for the first time. SPEC-000's own
+Out-of-Scope section had explicitly deferred this: "conformance ... does so against a mocked
+HTTP/SDK boundary, not a live call." All unit tests were green going in.
+
+**Finding 1:** `zodToJsonSchema(schema, "SomeName")` (both call sites) emits a top-level
+`{ $ref, definitions }` wrapper with no top-level `"type"`. The Agent SDK's `outputFormat:
+{type: 'json_schema'}` is implemented as an end-turn tool call, and the Anthropic API
+requires a tool's `input_schema` to be object-typed at the top level — a `$ref`-wrapped
+schema fails with `input_schema.type: Field required`, surfaced through the sidecar as a
+502. **Fixed:** drop the `name` argument; added a regression test pinning the request body
+shape (`sidecar.spec.ts`).
+
+**Finding 2:** `generatePlan`'s domain type is `Milestone[]` — an array — which violates the
+same object-typed `input_schema` constraint (`input_schema.type: Input should be 'object'`).
+**Fixed:** wrap the wire schema/response as `{ milestones: Milestone[] }`, unwrap on
+receipt. Also fixed `provider.contract.spec.ts`'s mock, which had encoded the old (buggy)
+wire shape and would have masked this exact bug in CI.
+
+**Finding 3:** `sidecar.ts` (client) and `agent-query.ts` (server) shared an identical 30s
+timeout with zero margin — a live call that legitimately took just over 30s server-side
+(30028ms) was aborted client-side moments earlier, discarding a response that would have
+succeeded. **Fixed:** client timeout set strictly longer than server timeout (+10s margin)
+for each operation.
+
+**Finding 4 (confirmed with Dele, not decided silently):** even after fixing Finding 3,
+`generatePlan` consistently hit the *server's own* 30s Agent SDK timeout in live testing
+(2/2 real attempts landed at ~30.0s or over) — a full 3-phase milestone plan is a
+meaningfully heavier generation task than a single STARS diagnosis (which reliably finished
+in 15-27s). `PLAN-000` had deliberately set 30s as a tradeoff between "long enough for cold
+start" and "short enough that a hang is legible on camera" during the demo, and SPEC-000
+explicitly scoped retry/backoff policy out — so raising the timeout is a real tradeoff call,
+not a pure bug fix. Presented options (raise `/plan`'s timeout only, add a retry policy, or
+file as a known issue and move on) via `AskUserQuestion`; Dele chose to raise `/plan`'s
+server-side budget only (30s → 60s, client 40s → 70s), leaving `/diagnose` at its original
+30s so the demo's diagnosis path keeps `PLAN-000`'s original camera-legibility property.
+
+**Also discovered, not a bug:** the `claude` CLI is not on `PATH` in this environment — it
+only exists bundled inside the versioned VS Code extension directory. This didn't block
+anything: `@anthropic-ai/claude-agent-sdk-darwin-arm64` ships its own bundled executable that
+the SDK uses directly, confirmed working with real subscription auth. Logged in `STATE.md`
+so a future session doesn't misdiagnose `which claude` failing as an auth blocker.
+
+**Why this matters for the video:** SPEC-000 explicitly named "not a live call" as an
+acknowledged gap in its own scope section back in Block 1 — this is that gap closing
+exactly as anticipated, and it found real, non-obvious bugs (a JSON-Schema library default
+that only breaks against a real tool-calling API, not a mock; a timeout race that only shows
+up under real latency) that no amount of additional mocked-boundary unit testing could have
+caught. It's a concrete, second instance of the Block 3 thesis first established by the
+Dockerfile/`next.config.ts` and zod-version findings: parallel/isolated work is fast, but
+integration against the real thing is where a distinct class of bug actually surfaces.
+
+**Note on process:** PR #65 (this fix) could not be merged by the agent session — `gh pr
+merge` was denied by Claude Code's auto-mode safety classifier ("Merge Without Review"),
+the same class of guardrail that blocked self-approval during Block 1's branch-protection
+work. All 6 required checks are green; merge is pending Dele.
+
+---
