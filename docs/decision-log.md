@@ -349,3 +349,34 @@ than the case that went right the first time. Worth naming honestly in the video
 only showcasing the contract that was caught in advance.
 
 ---
+
+## 2026-09-14 — CI green checkmarks were misleading; verified manually instead
+
+**Context:** Reviewing PR #63 (W1, app slice) before merging, `gh pr checks` showed all 6
+required checks passing. Before trusting that, checked the actual job logs.
+
+**Finding:** PR #63's branch was created before PR #61 (W3, real CI wiring) merged to
+`main`. GitHub Actions runs a PR's workflow *file* from the merge-ref of the PR branch with
+the base branch — since `.github/workflows/ci.yml`'s real lint/typecheck/unit/build/e2e
+commands were still sitting unmerged in #61, PR #63's `lint` job (and the other four) were
+actually running the **old placeholder `echo` steps** from Block 0, not real commands. The
+green checkmarks were true but meaningless — they proved an echo statement ran, not that
+the code was correct.
+
+**Decision:** Did not merge on the strength of that checkmark. Instead, checked out PR #63's
+branch locally and ran `npm run lint`/`typecheck`/`test`/`build`/`test:e2e`/`check:traceability`
+directly, for real, before approving. All genuinely passed (39/39 tests, real production
+build, Tier-2 traceability green across all 4 specs).
+
+**Why this matters for the video:** this is the single clearest demonstration in the whole
+project of "verification before completion, evidence before assertions" as a real practice
+rather than a slogan — a CI badge that says green is not evidence by itself; what it actually
+ran is the evidence. Worth its own beat, since it's the kind of mistake ("CI's green, ship
+it") that's genuinely easy to make and easy to miss.
+
+**Consequence for merge order:** confirms the plan to merge #63 (app) before #61 (platform
+CI wiring) — once app/ exists on `main`, #61's own CI will get a chance to run the *real*
+commands against real code and produce a genuinely meaningful result, rather than #61
+merging first and #63 merging into a CI pipeline it was never tested against.
+
+---
