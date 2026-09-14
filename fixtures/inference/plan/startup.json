@@ -1,0 +1,47 @@
+{
+  "scenarioId": "startup",
+  "milestones": [
+    {
+      "id": "startup-1-30-a",
+      "phase": "1-30",
+      "order": 0,
+      "text": "Complete a landscape assessment: interview every existing stakeholder who will depend on the new function, and document current gaps in tooling, data, and process.",
+      "rationale": "In a Startup situation there is no existing function to inherit, so the first move is disciplined discovery of what's needed before building anything, not diagnosing an existing failure."
+    },
+    {
+      "id": "startup-1-30-b",
+      "phase": "1-30",
+      "order": 1,
+      "text": "Draft the founding team's role definitions and open the first two requisitions, prioritizing generalists who can operate without established process.",
+      "rationale": "Startup situations require standing up a team from zero, so early hiring of foundational roles is a first-30-day priority rather than a later-phase concern."
+    },
+    {
+      "id": "startup-31-60-a",
+      "phase": "31-60",
+      "order": 0,
+      "text": "Ship a first, deliberately narrow version of the core platform capability to one internal customer team as a proof of concept.",
+      "rationale": "A Startup's early win comes from proving the new function can deliver something real, at small scale, before scaling it further."
+    },
+    {
+      "id": "startup-31-60-b",
+      "phase": "31-60",
+      "order": 1,
+      "text": "Establish baseline operating rhythms for the new team: a weekly planning cadence, an on-call rotation, and a lightweight intake process for requests.",
+      "rationale": "Because this is a Startup, no operating rhythm exists yet to build on, so establishing one is itself a Day 31-60 milestone, not an assumed given."
+    },
+    {
+      "id": "startup-61-90-a",
+      "phase": "61-90",
+      "order": 0,
+      "text": "Present a 12-month roadmap and staffing plan to leadership, informed by what the first proof of concept revealed.",
+      "rationale": "By Days 61-90 a Startup situation shifts from proving viability to securing durable investment in the function being built."
+    },
+    {
+      "id": "startup-61-90-b",
+      "phase": "61-90",
+      "order": 1,
+      "text": "Formalize the team's charter and decision rights with adjacent functions, now that real delivery history exists to negotiate from.",
+      "rationale": "A Startup's structural decisions are best made once there's evidence behind them, which is why formalizing charter and scope lands in the final phase, not the first."
+    }
+  ]
+}

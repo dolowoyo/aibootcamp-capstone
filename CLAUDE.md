@@ -55,6 +55,11 @@ Superpowers owns the *verb* (how to brainstorm, plan, TDD). The `capstone-conven
 owns the *noun* (the SDD chain, file naming, traceability format, git/PR conventions) — invoke
 it whenever producing a spec, plan, task, issue, branch, commit, or PR. No overlap between them.
 
+**The GitHub Project board is a live status, not a batch reconciliation.** Move an issue's
+column as part of the action that changes its state (starting work, opening a PR, merging) —
+see `capstone-conventions`'s board-sync section for the exact commands. `/checkpoint` only
+catches what was missed; it isn't the primary mechanism.
+
 ---
 
 ## Session continuity

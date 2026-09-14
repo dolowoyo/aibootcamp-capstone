@@ -1,0 +1,13 @@
+{
+  "scenarioId": "turnaround",
+  "narrative": "I've taken over as Director of Customer Support after two consecutive quarters of missed SLAs, a 40 percent spike in escalations, and the previous director's abrupt departure. Morale is low, our churn-driving support backlog has ballooned to over 3,000 open tickets, and the executive team has made it clear this needs to be turned around within two quarters or the function may be outsourced entirely.",
+  "diagnosis": {
+    "dominantType": "turnaround",
+    "confidence": "high",
+    "rationale": "The narrative's own language — 'two consecutive quarters of missed SLAs' and 'backlog has ballooned to over 3,000 open tickets' — describes an acute, measurable decline with an explicit executive mandate to reverse it within two quarters, which is a Turnaround: recognizing and fixing a demonstrably failing situation, not building something new.",
+    "evidence": [
+      "two consecutive quarters of missed SLAs",
+      "backlog has ballooned to over 3,000 open tickets"
+    ]
+  }
+}

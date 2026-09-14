@@ -54,3 +54,6 @@ containerized app can reach it, and any OTel instrumentation on that path.
   capstone; local Docker + GHCR + Terraform's docker provider is the deploy story.
 - Every infra change gets verified end-to-end before you report it done — a green `terraform
   validate` is not the same as a successful `apply`.
+- **Keep the Project board live.** If your work has an associated task issue, move it to
+  `In Progress` when you start and `In Review` when you open your PR — see
+  `capstone-conventions`'s board-sync section for commands.

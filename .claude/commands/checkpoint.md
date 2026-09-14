@@ -15,7 +15,20 @@ the project.
    - `gh pr list --state open --json number,title,headRefName,statusCheckRollup,reviewDecision`
    - `gh run list --limit 5 --json status,conclusion,workflowName`
 
-2. **Rewrite `docs/STATE.md` completely** (overwrite, don't append) using this shape:
+2. **Reconcile the Project board against reality — this is a safety net, not the primary
+   mechanism.** Individual agents are responsible for moving their own issues live (see
+   `capstone-conventions`'s board-sync section) — this step catches anything missed, it
+   doesn't replace that:
+   - Any merged PR whose issues aren't yet closed / in `Done` → close them (referencing the
+     PR) and move them.
+   - Any issue with an open PR referencing it, still sitting in `Plan/Tasks` → move to
+     `In Review`.
+   - Any issue with real work clearly underway (commits on a branch, an active worktree) but
+     still in `Plan/Tasks` → move to `In Progress`.
+   - Report any board drift you find and fix in step 5's summary — it's a signal something
+     upstream isn't following the rule, not just routine housekeeping.
+
+3. **Rewrite `docs/STATE.md` completely** (overwrite, don't append) using this shape:
 
    ```markdown
    # Current State — updated <ISO timestamp>
@@ -37,18 +50,19 @@ the project.
    - <anything time-sensitive or easy to lose — e.g. "recording is running">
    ```
 
-3. **If anything happened since the last checkpoint that a future reader would need
+4. **If anything happened since the last checkpoint that a future reader would need
    explained** (a scope cut, an overridden agent, a spec amendment, an architectural
    call) — append an entry to `docs/decision-log.md` using its documented format.
    Do not touch past entries. If nothing decision-worthy happened, skip this step.
 
-4. **Commit both files together:**
+5. **Commit both files together:**
    ```
    git add docs/STATE.md docs/decision-log.md
    git commit -m "chore: checkpoint — <one-line summary of where things stand>"
    ```
 
-5. Report back in 3-5 lines: what changed since the last checkpoint, and what's next.
+6. Report back in 3-5 lines: what changed since the last checkpoint, what's next, and any
+   board drift found and fixed in step 2.
 
 ## Rules
 

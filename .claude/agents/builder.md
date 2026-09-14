@@ -52,3 +52,7 @@ out of the provider interface.
   expected; an untracked change is not.
 - Update `docs/STATE.md`'s relevant "in flight" line when you hand back, or ask the
   orchestrator to run `/checkpoint`.
+- **Keep the Project board live, not caught up later.** Move your task issue(s) to
+  `In Progress` when you actually start work on them, and to `In Review` when you open your
+  PR — see `capstone-conventions`'s board-sync section for the exact commands and IDs. This
+  is part of finishing the action, not a deferred chore.

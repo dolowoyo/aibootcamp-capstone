@@ -1,0 +1,47 @@
+{
+  "scenarioId": "turnaround",
+  "milestones": [
+    {
+      "id": "turnaround-1-30-a",
+      "phase": "1-30",
+      "order": 0,
+      "text": "Triage the open backlog to stop active bleeding: identify and personally resolve the ten highest-severity escalations within the first two weeks.",
+      "rationale": "A Turnaround demands stopping the acute failure immediately — visible, fast action on the worst-hit cases is what a Turnaround's first 30 days require, unlike a Startup's discovery-first approach."
+    },
+    {
+      "id": "turnaround-1-30-b",
+      "phase": "1-30",
+      "order": 1,
+      "text": "Hold direct, individual conversations with the executives most affected by the missed SLAs to rebuild credibility and reset expectations honestly.",
+      "rationale": "Turnaround situations carry damaged trust with stakeholders, so rebuilding that trust directly is a first-30-day priority specific to a Turnaround, not a generic onboarding step."
+    },
+    {
+      "id": "turnaround-31-60-a",
+      "phase": "31-60",
+      "order": 0,
+      "text": "Implement a new triage and escalation process that prevents the specific failure pattern that caused the SLA misses from recurring.",
+      "rationale": "Once the acute crisis is stabilized, a Turnaround's next phase is fixing the process that caused the decline, distinguishing it from a Startup's phase of scaling something new."
+    },
+    {
+      "id": "turnaround-31-60-b",
+      "phase": "31-60",
+      "order": 1,
+      "text": "Publish a visible weekly scorecard of the backlog trend to the executive team to demonstrate the turnaround is measurably underway.",
+      "rationale": "A Turnaround needs to prove reversal with evidence stakeholders can see, given the mandate that came with an explicit performance failure."
+    },
+    {
+      "id": "turnaround-61-90-a",
+      "phase": "61-90",
+      "order": 0,
+      "text": "Restructure the team's staffing model based on what the recovery revealed about where capacity was actually missing.",
+      "rationale": "By Days 61-90, a Turnaround moves from stabilization to structural fixes that prevent the same failure mode from returning."
+    },
+    {
+      "id": "turnaround-61-90-b",
+      "phase": "61-90",
+      "order": 1,
+      "text": "Formally close the crisis narrative with leadership by presenting the reversed metrics against the original mandate and setting a new steady-state target.",
+      "rationale": "A Turnaround's final phase is about converting a proven reversal into a new, sustainable baseline the mandate can be measured against."
+    }
+  ]
+}

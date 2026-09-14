@@ -1,6 +1,6 @@
 # SPEC-003 — Stakeholder & coalition map
 
-**Status:** approved
+**Status:** implemented
 **Owner:** architect
 **Depends on:** None from SPEC-000/SPEC-001/SPEC-002 — this spec's data source is the planned
 `mcp/onboarding-context` MCP server (org/calendar fixture data), not the LLM inference
