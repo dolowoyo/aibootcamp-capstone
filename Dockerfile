@@ -30,8 +30,10 @@ RUN npm ci --workspace app --include-workspace-root
 FROM node:${NODE_VERSION} AS builder
 WORKDIR /repo
 
+# npm workspaces hoists dependencies to the root node_modules/ -- app/node_modules is not
+# a real, copyable dependency tree (confirmed empty except a stray .vite cache dir during
+# Block 2 integration; see docs/decision-log.md). Copying only the root is correct here.
 COPY --from=deps /repo/node_modules ./node_modules
-COPY --from=deps /repo/app/node_modules ./app/node_modules
 COPY . .
 
 # Tests/CI never call live inference — see docs/adr/0002-fixture-first-testing.md. The
@@ -64,9 +66,16 @@ RUN mkdir -p /app/.next && chown -R node:node /app
 # plus a pruned node_modules; `.next/static` and `public/` are not included in
 # `standalone` and must be copied alongside it explicitly. See:
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
+#
+# IMPORTANT: because `outputFileTracingRoot` (app/next.config.ts) points at the monorepo
+# root one level above `app/`, standalone output preserves that relative path -- server.js
+# lands at `standalone/app/server.js`, NOT flatly at `standalone/server.js`. Confirmed by
+# actually running the built image during Block 2 integration (it failed with
+# MODULE_NOT_FOUND on a flat `server.js` path before this was found); see
+# docs/decision-log.md. Static assets and public/ are copied to match that same nesting.
 COPY --from=builder --chown=node:node /repo/app/.next/standalone ./
-COPY --from=builder --chown=node:node /repo/app/.next/static ./.next/static
-COPY --from=builder --chown=node:node /repo/app/public ./public
+COPY --from=builder --chown=node:node /repo/app/.next/static ./app/.next/static
+COPY --from=builder --chown=node:node /repo/app/public ./app/public
 
 USER node
 
@@ -77,4 +86,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD ["node", "-e", "fetch('http://127.0.0.1:'+ (process.env.PORT||3000) +'/api/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
 
-CMD ["node", "server.js"]
+CMD ["node", "app/server.js"]
