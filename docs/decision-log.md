@@ -380,3 +380,43 @@ commands against real code and produce a genuinely meaningful result, rather tha
 merging first and #63 merging into a CI pipeline it was never tested against.
 
 ---
+
+## 2026-09-14 — Real container integration testing found two bugs before merging PR #61
+
+**Context:** Before merging W3's platform PR (#61), rebased its branch onto the now-updated
+`main` (which has W1's app code from PR #63) to get a genuine CI signal — and, while at it,
+actually ran `docker compose build app` and `docker run` locally rather than trusting that
+the Dockerfile was correct because it read correctly and had passed structural checks
+(`hadolint`, `terraform validate`) in isolation, against code it couldn't see at the time.
+
+**Findings, both real and neither caught by any automated check:**
+1. `app/next.config.ts` had a comment describing `output: "standalone"` as required, but
+   never actually set the config key. `next build` never produced `.next/standalone/` at
+   all — the Dockerfile's later `COPY` of that directory would have failed the moment
+   `app/` genuinely existed to build against.
+2. The Dockerfile copied `app/node_modules` as a real dependency tree; npm workspaces
+   hoists everything to the root `node_modules/`, so `app/node_modules` was empty except a
+   stray `.vite` cache directory. This copy step would always have failed or copied nothing
+   useful.
+3. A third, dependent issue: with `outputFileTracingRoot` pointing one level above `app/`
+   (the monorepo root), Next's standalone output preserves that relative path — `server.js`
+   lands at `standalone/app/server.js`, not a flat `standalone/server.js`. The Dockerfile's
+   copy destinations and `CMD` assumed the flat layout used in single-package (non-monorepo)
+   Next.js tutorials.
+
+**Decision:** Fixed all three directly — `output: "standalone"` (committed to `main`, since
+that file is part of already-merged PR #63), and the Dockerfile's `node_modules` copy +
+nested-path `COPY`/`CMD` (committed to `block-2/w3-platform`, PR #61, not yet merged).
+Verified end to end afterward: real `docker build`, real `docker run`, `/api/healthz` →
+`200`, and `/`, `/diagnosis`, `/plan`, `/stakeholders` all → `200`.
+
+**Why this matters for the video:** every individual piece of this (W1's config, W3's
+Dockerfile) had been reviewed and had passed the checks available to it *in isolation* —
+`hadolint`, `terraform validate`, a syntactically valid Next.js config. None of those checks
+could catch a mismatch between two files built by two agents who never saw each other's
+code. This is the concrete argument for why Block 3 ("integration") is a real phase and not
+a formality — parallel worktrees are fast, but they produce exactly this class of bug, and
+the only way to catch it is to actually run the whole thing together, not just each piece
+alone.
+
+---
