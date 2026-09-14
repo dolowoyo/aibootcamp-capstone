@@ -1,6 +1,6 @@
 # SPEC-002 — 30/60/90 plan generation
 
-**Status:** approved
+**Status:** implemented
 **Owner:** architect
 **Depends on:** SPEC-000 (inference provider contract — this spec consumes the `generatePlan`
 operation and owns the field contents of the milestone/plan shape SPEC-000 deliberately left

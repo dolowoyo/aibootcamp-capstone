@@ -1,6 +1,6 @@
 # SPEC-001 — STARS situation diagnosis
 
-**Status:** approved
+**Status:** implemented
 **Owner:** architect
 **Depends on:** SPEC-000 (inference provider contract — this spec consumes the `diagnoseStars`
 operation and owns the field contents of the `StarsDiagnosis` shape SPEC-000 deliberately left
