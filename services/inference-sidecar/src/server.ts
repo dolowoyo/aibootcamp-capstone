@@ -18,9 +18,19 @@ import type { QueryFn } from "./agent-query.js";
 export interface SidecarServerOptions {
   /** Injectable for tests; defaults to the real Agent SDK's query() inside agent-query.ts. */
   queryFn?: QueryFn;
-  /** Defaults to 30s (agent-query.ts's own default) when omitted. */
+  /**
+   * Overrides the timeout for every route uniformly (used by tests). When omitted, each route
+   * gets its own default: /diagnose uses agent-query.ts's own 30s default, /plan uses
+   * PLAN_TIMEOUT_MS below. Split after a live Block 3 run found generatePlan's real latency
+   * (a full 3-phase milestone plan, heavier than a single diagnosis) consistently exceeded a
+   * shared 30s budget -- confirmed with Dele: only /plan's budget moves, /diagnose keeps 30s
+   * so the demo's diagnosis path stays legible on camera per PLAN-000's original tradeoff.
+   */
   timeoutMs?: number;
 }
+
+/** /plan's own server-side budget -- see SidecarServerOptions.timeoutMs's doc comment. */
+const PLAN_TIMEOUT_MS = 60_000;
 
 const ROUTES = new Set(["/diagnose", "/plan"]);
 
@@ -79,7 +89,7 @@ export function createServer(options: SidecarServerOptions = {}): Server {
       const result = await runStructuredQuery({
         prompt: body.prompt,
         schema: body.schema,
-        timeoutMs: options.timeoutMs,
+        timeoutMs: options.timeoutMs ?? (url === "/plan" ? PLAN_TIMEOUT_MS : undefined),
         queryFn: options.queryFn,
       });
       sendJson(res, 200, { result });

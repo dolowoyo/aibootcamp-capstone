@@ -46,6 +46,22 @@ Backs `sidecar.ts`'s `generatePlan(diagnosis)`. Identical request/response shape
 two routes exist as named endpoints (rather than one generic one) so logs/metrics can
 distinguish which `InferenceProvider` operation a request came from.
 
+**One difference from `/diagnose`: `/plan`'s timeout budget is 60s, not 30s** (`server.ts`'s
+`PLAN_TIMEOUT_MS`). A live Block 3 integration run found that generating a full 3-phase
+milestone plan (heavier than a single STARS diagnosis) consistently exceeded a shared 30s
+budget -- confirmed with Dele to raise only `/plan`'s server-side timeout, leaving
+`/diagnose` at 30s so its camera-legible failure mode (per `PLAN-000`'s original tradeoff)
+is unchanged. `sidecar.ts`'s client-side timeout for each route tracks its own server budget
+plus a 10s margin (40s for `/diagnose`, 70s for `/plan`) -- see that file's doc comment.
+
+**Also note: `/plan`'s request `schema` is object-typed, not the bare `Milestone[]` array.**
+The Agent SDK's `outputFormat: {type: 'json_schema'}` is implemented as an end-turn tool
+call, and the Anthropic API requires a tool's `input_schema` to be object-typed at the top
+level (tool calls always carry a JSON object of named arguments). `sidecar.ts` wraps the
+milestone array as `{ milestones: Milestone[] }` on the way out and unwraps
+`result.milestones` on the way back; this process itself is unaffected since it only
+forwards whatever `schema` it's given.
+
 ### Why `{ prompt, schema }` rather than `{ intake }` / `{ diagnosis }` directly
 
 This process is intentionally domain-ignorant: it doesn't import or know about

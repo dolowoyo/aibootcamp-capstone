@@ -45,12 +45,18 @@ describe("provider contract", () => {
 
     // Wire shape per services/inference-sidecar/README.md (reconciled 2026-09-13):
     // POST /diagnose | /plan -> { prompt, schema } in, { result: <object> } out on 200.
+    // /plan's result is { milestones: Milestone[] }, not a bare array -- the Anthropic API
+    // requires a structured-output tool's input_schema to be object-typed at the top level, so
+    // sidecar.ts wraps the array in an object on the way out and unwraps it on the way back
+    // (found via a live Block 3 integration run, see sidecar.ts's milestoneListWireSchema doc).
     const sidecarProvider = new SidecarProvider({} as unknown as NodeJS.ProcessEnv, {
       fetchImpl: (async (url: string) => {
         if (url.endsWith("/diagnose")) {
           return new Response(JSON.stringify({ result: RAW_DIAGNOSIS }), { status: 200 });
         }
-        return new Response(JSON.stringify({ result: RAW_MILESTONES }), { status: 200 });
+        return new Response(JSON.stringify({ result: { milestones: RAW_MILESTONES } }), {
+          status: 200,
+        });
       }) as unknown as typeof fetch,
     });
     await assertConformance(sidecarProvider);

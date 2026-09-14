@@ -6,10 +6,36 @@ import { starsDiagnosisSchema, type StarsDiagnosis } from "../schemas/stars-diag
 import { milestoneSchema, type Milestone } from "../schemas/plan";
 import { validateAgainstSchema } from "../validate";
 
-/** Resolves SPEC-000's open question on timeout duration (PLAN-000): 30s. */
-const DEFAULT_TIMEOUT_MS = 30_000;
+/**
+ * PLAN-000 resolves SPEC-000's open question on timeout duration as 30s for the Agent SDK
+ * call itself -- that's still the budget `services/inference-sidecar`'s own agent-query.ts
+ * enforces on /diagnose. A live Block 3 run found two distinct problems:
+ * 1. This adapter's client-side timeout must be strictly longer than the server's, or the
+ *    client aborts a response the server was legitimately about to deliver (an equal 30s/30s
+ *    budget races). The 10s margin here absorbs network/serialization overhead only -- it
+ *    doesn't change the server's own Agent SDK budget.
+ * 2. generatePlan's real latency (a full 3-phase milestone plan, a heavier generation than a
+ *    single diagnosis) consistently exceeded even a 30s *server-side* budget in live testing
+ *    (2/2 real attempts landed at ~30.0s). Confirmed with Dele: /plan gets its own, longer
+ *    server-side budget (server.ts's PLAN_TIMEOUT_MS); /diagnose keeps the original 30s so the
+ *    demo's diagnosis path stays legible on camera per PLAN-000's original tradeoff. Each
+ *    operation's client-side timeout below tracks its own server budget plus the same 10s
+ *    margin.
+ */
+const DIAGNOSE_TIMEOUT_MS = 40_000; // 30s server budget (agent-query.ts) + 10s margin
+const PLAN_TIMEOUT_MS = 70_000; // 60s server budget (server.ts's PLAN_TIMEOUT_MS) + 10s margin
 
 const milestoneListSchema = z.array(milestoneSchema);
+
+/**
+ * The Agent SDK's outputFormat: {type: 'json_schema'} is implemented as an end-turn tool call,
+ * and the Anthropic API requires a tool's input_schema to be object-typed at the top level
+ * (tool calls always carry a JSON object of named arguments -- arrays aren't valid there).
+ * generatePlan's domain result is Milestone[], so the wire schema wraps it in a single
+ * "milestones" field; buildPlanPrompt instructs the model accordingly, and generatePlan
+ * unwraps result.milestones before validating against milestoneListSchema.
+ */
+const milestoneListWireSchema = z.object({ milestones: milestoneListSchema });
 
 export interface SidecarProviderOptions {
   fetchImpl?: typeof fetch;
@@ -46,32 +72,45 @@ export interface SidecarProviderOptions {
  */
 export class SidecarProvider implements InferenceProvider {
   private readonly baseUrl: string;
-  private readonly timeoutMs: number;
+  private readonly diagnoseTimeoutMs: number;
+  private readonly planTimeoutMs: number;
   private readonly fetchImpl: typeof fetch;
 
   constructor(env: NodeJS.ProcessEnv = process.env, options: SidecarProviderOptions = {}) {
     this.baseUrl = env.INFERENCE_SIDECAR_URL ?? "http://host.docker.internal:8787";
-    this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    this.diagnoseTimeoutMs = options.timeoutMs ?? DIAGNOSE_TIMEOUT_MS;
+    this.planTimeoutMs = options.timeoutMs ?? PLAN_TIMEOUT_MS;
     this.fetchImpl = options.fetchImpl ?? fetch;
   }
 
   async diagnoseStars(intake: unknown): Promise<StarsDiagnosis> {
     const prompt = buildDiagnosePrompt(intake);
-    const schema = zodToJsonSchema(starsDiagnosisSchema, "StarsDiagnosis");
-    const result = await this.callSidecar("/diagnose", prompt, schema);
+    // No `name` argument: passing one makes zodToJsonSchema emit a top-level
+    // { $ref, definitions } wrapper instead of an inline schema. The Agent SDK forwards this
+    // as a structured-output tool's input_schema, and the Anthropic API requires that to have
+    // a top-level "type" -- a $ref-wrapped schema fails with "input_schema.type: Field
+    // required" (surfaced here as a 502, found via a live Block 3 integration run).
+    const schema = zodToJsonSchema(starsDiagnosisSchema);
+    const result = await this.callSidecar("/diagnose", prompt, schema, this.diagnoseTimeoutMs);
     return validateAgainstSchema(starsDiagnosisSchema, result);
   }
 
   async generatePlan(diagnosis: unknown): Promise<Milestone[]> {
     const prompt = buildPlanPrompt(diagnosis);
-    const schema = zodToJsonSchema(milestoneListSchema, "Milestones");
-    const result = await this.callSidecar("/plan", prompt, schema);
-    return validateAgainstSchema(milestoneListSchema, result);
+    const schema = zodToJsonSchema(milestoneListWireSchema);
+    const result = await this.callSidecar("/plan", prompt, schema, this.planTimeoutMs);
+    const { milestones } = validateAgainstSchema(milestoneListWireSchema, result);
+    return milestones;
   }
 
-  private async callSidecar(path: string, prompt: string, schema: unknown): Promise<unknown> {
+  private async callSidecar(
+    path: string,
+    prompt: string,
+    schema: unknown,
+    timeoutMs: number
+  ): Promise<unknown> {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
       let response: Response;
       try {
@@ -130,8 +169,9 @@ function buildDiagnosePrompt(intake: unknown): string {
 function buildPlanPrompt(diagnosis: unknown): string {
   return [
     "You are generating a situation-aware 30/60/90-day milestone plan for a new leader.",
-    "Their STARS diagnosis (JSON) is below. Return milestones grouped across Days 1-30,",
-    "Days 31-60, and Days 61-90, each with a rationale referencing the situation type.",
+    "Their STARS diagnosis (JSON) is below. Return an object with a \"milestones\" array,",
+    "grouped across Days 1-30, Days 31-60, and Days 61-90, each with a rationale referencing",
+    "the situation type.",
     "",
     "Diagnosis:",
     JSON.stringify(diagnosis),
