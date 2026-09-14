@@ -88,9 +88,43 @@ learning-roadmap session, e.g. `session-4` for the MCP server, `session-7` for p
 
 `SPEC-001 — STARS` · `SPEC-002 — Plan` · `SPEC-003 — Stakeholders` · `Backlog — Post-Capstone`
 
-## GitHub Project board columns
+## GitHub Project board columns — keep this live, not a batch catch-up
 
 `Backlog` → `Spec` → `Plan/Tasks` → `In Progress` → `In Review` → `Done`
 
+**This is a hard rule, not a nice-to-have:** the board must reflect where work actually is
+*as it happens*, so the project gives a real-time view without anyone needing to ask "where
+are we?" Moving a card is part of finishing the action that changes an issue's state — not a
+deferred reconciliation pass. Concretely:
+
+| When you... | Move the issue(s) to... |
+|---|---|
+| File a task issue (architect, from a TASKS-00N breakdown) | `Plan/Tasks` |
+| Start actual implementation work on a task (builder/qa-engineer/platform-engineer) | `In Progress` |
+| Open a PR that claims to satisfy a task | `In Review` |
+| Merge that PR (orchestrator) | `Done` **and** close the issue, referencing the PR |
+
+**Commands** (project number `1`, owner `dolowoyo` — these IDs are stable, reuse them
+directly rather than re-discovering them each time):
+
+```sh
+PROJECT_ID="PVT_kwHOEtWQws4BjYpZ"
+STATUS_FIELD="PVTSSF_lAHOEtWQws4BjYpZzhiNHns"
+# Option IDs: Backlog=be9e799f  Spec=77c47909  Plan/Tasks=3a5b26a2
+#             In Progress=7ecaf11a  In Review=747eb7ca  Done=150560f2
+
+# Find an issue's project item ID:
+item_id=$(gh project item-list 1 --owner dolowoyo --format json --limit 100 | \
+  python3 -c "import json,sys; d=json.load(sys.stdin); print([i['id'] for i in d['items'] if i.get('content',{}).get('number')==<ISSUE_NUMBER>][0])")
+
+# Move it:
+gh project item-edit --project-id "$PROJECT_ID" --id "$item_id" --field-id "$STATUS_FIELD" \
+  --single-select-option-id "<OPTION_ID>"
+```
+
+If an issue isn't on the board yet (`item_id` comes back empty), add it first:
+`gh project item-add 1 --owner dolowoyo --url <issue-url> --format json -q .id`.
+
 An issue's column should reflect where it actually is in the SDD chain, not just "open" vs
-"closed" — that's what makes the board itself a demoable artifact.
+"closed" — that's what makes the board itself a demoable, real-time artifact rather than a
+static list someone has to interpret against the git log.

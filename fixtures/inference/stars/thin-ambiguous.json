@@ -1,0 +1,13 @@
+{
+  "scenarioId": "thin-ambiguous",
+  "narrative": "I just started a new leadership role and I'm still getting settled in. There's a team here and we have some projects going on. I'm meeting people and learning about how things work day to day, and I expect to have a clearer picture after a few more weeks in the seat.",
+  "diagnosis": {
+    "dominantType": "startup",
+    "confidence": "low",
+    "rationale": "The narrative offers no specific signal distinguishing a Startup, Turnaround, Accelerated Growth, Realignment, or Sustaining Success situation — phrases like 'still getting settled in' and 'some projects going on' are generic onboarding language. This classification reflects explicitly limited evidence rather than a falsely confident guess, and more detail would sharpen it.",
+    "evidence": [
+      "still getting settled in",
+      "some projects going on"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "scenarioId": "startup",
+  "narrative": "I'm stepping into a newly created VP of Data Platform role at a Series C fintech company. There is no existing data team, no analytics infrastructure, and no established roadmap to inherit — I'm building the function from scratch, hiring the first five engineers, and defining what 'good' looks like from zero. My CEO has asked me to stand up a greenfield data platform within two quarters, and there is no legacy system to migrate away from because nothing exists yet.",
+  "diagnosis": {
+    "dominantType": "startup",
+    "confidence": "high",
+    "rationale": "The narrative describes building a function from scratch with no existing team, infrastructure, or roadmap to inherit — phrases like 'no existing data team, no analytics infrastructure' and 'building the function from scratch' are hallmark Startup-situation signals, not the recognition-and-repair of something that already exists.",
+    "evidence": [
+      "no existing data team, no analytics infrastructure",
+      "building the function from scratch, hiring the first five engineers"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "scenarioId": "blended-turnaround-realignment",
+  "narrative": "I'm the new VP of Operations at a manufacturing division that missed its last three quarterly targets and is under real financial pressure, but the deeper issue is that our regional teams operate under three different reporting structures left over from a merger two years ago, with duplicated roles and conflicting priorities across sites. Fixing the immediate performance shortfall matters, but so does resolving the structural misalignment between sites that has quietly been causing it.",
+  "diagnosis": {
+    "dominantType": "turnaround",
+    "secondaryType": "realignment",
+    "confidence": "medium",
+    "rationale": "Missed quarterly targets and financial pressure are Turnaround signals ('missed its last three quarterly targets'), but the narrative gives comparable weight to structural misalignment from the merger — 'duplicated roles and conflicting priorities across sites' — which is a Realignment signal, so this is treated as a blended situation with Turnaround as dominant and Realignment as secondary.",
+    "evidence": [
+      "missed its last three quarterly targets",
+      "duplicated roles and conflicting priorities across sites"
+    ]
+  }
+}

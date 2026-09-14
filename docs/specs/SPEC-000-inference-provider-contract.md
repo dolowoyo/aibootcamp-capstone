@@ -1,6 +1,6 @@
 # SPEC-000 — Inference provider contract
 
-**Status:** approved
+**Status:** implemented
 **Owner:** architect
 **Depends on:** None (foundational). Formalizes `docs/adr/0001-inference-boundary.md`.
 SPEC-001 and SPEC-002 depend on this spec's interface.
