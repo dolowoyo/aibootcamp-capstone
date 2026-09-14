@@ -42,3 +42,6 @@ against acceptance criteria, and bug investigation. You do not own product scope
 - Regression tests for fixed bugs get added to the relevant spec's traceability table if
   they correspond to an AC that was under-tested; otherwise they're just good hygiene and
   don't need a table entry.
+- **Keep the Project board live.** When you file a bug, it lands on the board by default at
+  whatever status `gh project item-add` gives it — set it explicitly (usually `In Progress`
+  if you're fixing it now). See `capstone-conventions`'s board-sync section for commands.

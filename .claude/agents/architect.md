@@ -47,3 +47,6 @@ breakdowns. You do not write application code.
   spec.
 - `SPEC-000` (the inference provider contract) must exist and be approved before `SPEC-001`
   and `SPEC-002` — they depend on its interface.
+- **Keep the Project board live.** When you file a task issue, add it to the board at
+  `Plan/Tasks` status immediately — don't leave it for someone else to notice and place
+  later. See `capstone-conventions`'s board-sync section for the exact commands/IDs.
