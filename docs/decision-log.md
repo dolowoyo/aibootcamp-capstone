@@ -450,3 +450,43 @@ Worth naming as a concrete "what I'd do differently": a shared dependency-versio
 worktrees fork, would have prevented this rather than requiring it to be caught at merge time.
 
 ---
+
+## 2026-09-14 — Diagnosed: custom subagent tool grants freeze at first discovery
+
+**Context:** W1 (Block 2) reported the `Skill` tool wasn't available to it despite
+`.claude/agents/builder.md`'s frontmatter granting it — a fix made earlier in this same
+session (see the 2026-09-13 "None of the 7 agent definitions could actually invoke a skill"
+entry). Investigated with two throwaway diagnostic subagents rather than guessing.
+
+**Finding:** Spawned a `builder`-type subagent and a `general-purpose`-type subagent, each
+asked only to report its own available tools and attempt a live `Skill()` call.
+`general-purpose` (a built-in type) had `Skill` and used it successfully.
+`builder` (a custom, project-defined type) did not — it failed with
+`"Skill is disabled for this session, in subagents as well as here."`
+
+The timeline fits exactly: when `builder.md` was first written (Block 0), its `tools:` line
+was `Read, Write, Edit, Bash, Grep, Glob` — no `Skill`. The harness's own announcement of the
+new custom agent types, at that moment, showed exactly that 6-tool list. `Skill` was added to
+the frontmatter afterward, mid-session (Block 1) — but the harness appears to register a
+custom subagent type's permitted tools once, at first discovery, and does not re-scan
+`.claude/agents/*.md` again within the same session. Editing the file afterward has no
+effect until a fresh session re-discovers the agents.
+
+(Incidentally, this also explains why the diagnostic showed no `Grep`/`Glob` for either
+agent type: those aren't distinct tools in this environment at all — search happens through
+`Bash` — so listing them in frontmatter was always inert, unrelated to the `Skill` gap.)
+
+**Decision:** Restarting the session before Block 3, on Dele's call, so all 7 custom agents
+get re-discovered fresh with `Skill` genuinely available going forward.
+
+**Why this matters for the video:** genuinely worth its own beat. The mitigating fact is
+also worth stating plainly: Block 2's agents followed their bound-skill instructions
+faithfully as *written text* the whole time (real TDD evidence: tests written before
+implementation, confirmed red then green; `verification-before-completion` genuinely run
+before every PR) — the formal `Skill()` invocation would have loaded superpowers' fuller
+methodology write-up, but its absence didn't compromise the actual practice. That's a
+meaningful finding about where the value in an agent-definition system actually comes from:
+a lot of it is the written instructions an agent reads directly, not only the tooling that
+formally invokes a packaged skill.
+
+---

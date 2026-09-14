@@ -1,7 +1,10 @@
-# Current State — updated 2026-09-14T00:35Z (Block 2 COMPLETE)
+# Current State — updated 2026-09-14T00:45Z (Block 2 COMPLETE — session restarting)
 
 Block: 2 (parallel worktree build) — **complete.** All 3 PRs merged, CI genuinely green on
-`main`, all worktrees and stale branches cleaned up. Ready for Block 3 (integration).
+`main`, all worktrees and stale branches cleaned up. **This session is about to restart on
+Dele's call, specifically so custom agents re-register with the `Skill` tool genuinely
+available (see the Skill-tool finding below) — the next session should run
+`/resume-capstone` first, then proceed straight into Block 3.**
 
 Active specs: `SPEC-000`/`001`/`002`/`003` all merged, all now `Status: implemented`
 (flipped by W1 once real tests existed) — Tier 2 traceability genuinely passing for all four.
@@ -27,9 +30,15 @@ Active specs: `SPEC-000`/`001`/`002`/`003` all merged, all now `Status: implemen
   a backtick-parsing bug, and the two-tier enforcement model (specs merge before their tests
   exist; `Status: implemented` activates strict test-resolution per spec).
 - **None of the 7 agent definitions had the `Skill` tool granted** — fixed before Block 2
-  launched. (One open thread: W1 still reported `Skill` unavailable at runtime despite the
-  frontmatter fix — the written instructions were followed faithfully regardless, but the
-  literal tool-grant mechanism is worth investigating further, not fully diagnosed.)
+  launched, but **diagnosed as ineffective mid-session**: custom subagent types appear to have
+  their tool grants registered once, at first discovery, and are not re-scanned from
+  `.claude/agents/*.md` again within the same session. Confirmed empirically with two
+  diagnostic subagents (a `builder`-type lacked `Skill` with the exact error "disabled for
+  this session"; a `general-purpose`-type had it and used it successfully). Mitigating fact:
+  Block 2's agents still followed their bound-skill instructions faithfully as written text
+  the whole time — real TDD evidence, real verification-before-completion. **Resolution:**
+  restarting the session (Dele's call) so all 7 agents re-register fresh with `Skill`
+  genuinely available before Block 3 begins. Full account in decision-log.
 - **`.claude/worktrees/` was never gitignored** before first real worktree use — caught and
   fixed; nothing was ever committed.
 - **A sidecar HTTP wire-contract gap** — pre-resolved the MCP tool contract before launch,
@@ -52,13 +61,17 @@ Active specs: `SPEC-000`/`001`/`002`/`003` all merged, all now `Status: implemen
 
 ## Next 3 actions
 
-1. Start Block 3 (integration): wire the sidecar → app end-to-end with real Agent SDK
+1. **First thing in the new session:** run `/resume-capstone` to reconcile this file against
+   live git/gh state, then confirm (e.g., re-run the diagnostic pattern used to find this
+   issue, or just proceed and watch the first agent's tool list) that `Skill` is now
+   genuinely available to custom agents before relying on it
+2. Start Block 3 (integration): wire the sidecar → app end-to-end with real Agent SDK
    inference; add the missing `/api/readyz` route (compose references it, only `healthz`
    exists); seed a coherent demo persona
-2. Run the full verification checklist from `docs/00-capstone-plan.md` — `terraform apply`
-   the real stack, `docker compose up` end-to-end including the app container
-3. Address the dev-dependency vulnerabilities `npm audit` flagged (vitest/vite/esbuild/
-   prisma toolchain, not runtime deps) — low priority, `npm audit fix` pass
+3. Run the full verification checklist from `docs/00-capstone-plan.md` — `terraform apply`
+   the real stack, `docker compose up` end-to-end including the app container. Also: address
+   the dev-dependency vulnerabilities `npm audit` flagged (vitest/vite/esbuild/prisma
+   toolchain, not runtime deps) — low priority, `npm audit fix` pass, whenever convenient
 
 ## Blockers / open decisions
 
@@ -67,9 +80,6 @@ Active specs: `SPEC-000`/`001`/`002`/`003` all merged, all now `Status: implemen
 - Docker daemon: **running** (Colima) as of this checkpoint — used for real verification
   during Block 2's merge sequence. Confirm still running at the start of Block 3.
 - Terraform v1.16.2 confirmed working at `/opt/homebrew/bin/terraform`.
-- **Open, not fully diagnosed:** why W1 reported the `Skill` tool unavailable despite the
-  frontmatter grant. Worth investigating before Block 3 if there's time, since Block 3 will
-  also run agents expected to invoke bound skills.
 
 ## Do not forget
 
