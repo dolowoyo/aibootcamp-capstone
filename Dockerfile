@@ -66,6 +66,23 @@ FROM node:${NODE_VERSION} AS runner
 # actually present at /app/fixtures/inference/stars under the old (mismatched) WORKDIR.
 WORKDIR /repo
 
+# The runner never invokes npm/npx/corepack at runtime (CMD below runs the standalone
+# server.js directly), but node:${NODE_VERSION}'s base layer still ships all three --
+# npm bundles its own tar/sigstore dependencies (used for npm install's own package
+# fetching/provenance verification, never exercised here), and those showed up as
+# real CRITICAL/HIGH CVEs in publish.yml's Trivy scan (unreachable at runtime, but
+# still present in the shipped image, so still a real finding). Removing them outright
+# is more correct than chasing a patched npm version -- this image doesn't need npm at
+# all, matching this stage's own "minimal, non-root production image" design goal.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+    /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
+
+# node:${NODE_VERSION}'s OS package snapshot can lag Alpine's own security-patch branch
+# between image-layer cache refreshes -- found via Trivy flagging libcrypto3/libssl3 CVEs
+# fixed in Alpine's own repo but not yet in the cached base layer. Explicit apk upgrade
+# pulls the current index rather than relying on whenever the base image was last built.
+RUN apk update && apk upgrade --no-cache && rm -rf /var/cache/apk/*
+
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
