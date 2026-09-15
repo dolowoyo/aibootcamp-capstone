@@ -1,5 +1,6 @@
 import { QUADRANT_POSTURE, type Quadrant } from "@lib/stakeholders/classify";
-import { getStakeholderMap } from "../_lib/store";
+import { buildStakeholderMap } from "@lib/stakeholders/map";
+import { stakeholderRepository } from "../_lib/prisma-instances";
 import { addStakeholderAction, repositionStakeholderAction } from "../_lib/actions";
 
 const QUADRANTS: Quadrant[] = ["ally", "opponent", "keep-informed", "monitor"];
@@ -11,8 +12,14 @@ const QUADRANT_LABELS: Record<Quadrant, string> = {
   monitor: "Monitor (low influence, low support)",
 };
 
-export default function StakeholdersPage() {
-  const map = getStakeholderMap();
+// This page reads current DB state on every request (SPEC-004: stakeholder positions
+// persist across routes/processes); it must never be statically prerendered/cached at
+// build time or the deployed app would freeze on a build-time snapshot.
+export const dynamic = "force-dynamic";
+
+export default async function StakeholdersPage() {
+  const stakeholders = await stakeholderRepository.findAll();
+  const map = buildStakeholderMap({ status: "unavailable" }, stakeholders);
 
   return (
     <div className="space-y-8">

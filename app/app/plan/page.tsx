@@ -1,6 +1,7 @@
 import { PHASES } from "@lib/inference/schemas/plan";
 import { exportPlan } from "@lib/plan/export";
-import { getDiagnosisRecord, getLastPlanError, getPlan } from "../_lib/store";
+import { getLastPlanError } from "../_lib/store";
+import { diagnosisRepository, planRepository } from "../_lib/prisma-instances";
 import {
   addMilestoneAction,
   editMilestoneAction,
@@ -14,9 +15,14 @@ const PHASE_LABELS: Record<(typeof PHASES)[number], string> = {
   "61-90": "Days 61-90",
 };
 
-export default function PlanPage() {
-  const diagnosisRecord = getDiagnosisRecord();
-  const plan = getPlan();
+// This page reads current DB state on every request (SPEC-004: plan state persists across
+// routes/processes); it must never be statically prerendered/cached at build time or the
+// deployed app would freeze on a build-time snapshot.
+export const dynamic = "force-dynamic";
+
+export default async function PlanPage() {
+  const diagnosisRecord = await diagnosisRepository.findLatest();
+  const plan = diagnosisRecord ? await planRepository.find(diagnosisRecord.id) : null;
   const error = getLastPlanError();
 
   return (
