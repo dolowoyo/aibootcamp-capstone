@@ -20,7 +20,7 @@ services:
       - "3000:3000"
     environment:
       LLM_PROVIDER: ${LLM_PROVIDER:-fixture}
-      SIDECAR_URL: http://host.docker.internal:8787
+      INFERENCE_SIDECAR_URL: http://host.docker.internal:8787
       DATABASE_URL: postgresql://first90:first90@postgres:5432/first90?schema=public
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       NODE_ENV: production
