@@ -91,7 +91,7 @@ export async function addStakeholderAction(formData: FormData): Promise<void> {
   const name = String(formData.get("name"));
   const influence = Number(formData.get("influence"));
   const support = Number(formData.get("support"));
-  const updated = addStakeholder(map, { name, influence, support });
+  const updated = addStakeholder(map, { name, influence, support }, () => crypto.randomUUID());
   await stakeholderRepository.saveAll(updated.stakeholders);
   revalidatePath("/stakeholders");
 }
