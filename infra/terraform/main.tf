@@ -49,6 +49,53 @@ resource "docker_container" "postgres" {
   restart = "unless-stopped"
 }
 
+# One-off: applies prisma/schema.prisma to postgres, then exits. Mirrors docker-compose.yml's
+# `migrate` service (see docs/decision-log.md, 2026-09-14 entry, and issue #74) -- built from
+# the Dockerfile's `builder` stage (which has the Prisma CLI + schema; docker_image.app,
+# pulled from GHCR, is the minimal runner image and deliberately doesn't). Without this,
+# every repository call fails with "relation does not exist" against a fresh database --
+# found via docker-compose.yml first, fixed the identical gap here.
+resource "docker_image" "migrate" {
+  name = "first90-migrate:local"
+  build {
+    context    = "${path.module}/../.."
+    dockerfile = "Dockerfile"
+    target     = "builder"
+  }
+  keep_locally = true
+}
+
+resource "docker_container" "migrate" {
+  name  = "first90-migrate"
+  image = docker_image.migrate.image_id
+
+  networks_advanced {
+    name = docker_network.first90.name
+  }
+
+  env = [
+    "DATABASE_URL=postgresql://${var.postgres_user}:${var.postgres_password}@${docker_container.postgres.name}:5432/${var.postgres_db}?schema=public",
+  ]
+
+  # Retries because Terraform's depends_on only orders resource *creation*, not Postgres's
+  # own readiness -- unlike docker-compose's `condition: service_healthy`, Terraform doesn't
+  # block on the healthcheck block below. 20 attempts * 2s covers a cold Postgres start with
+  # margin over the healthcheck's own 10s*5=50s budget.
+  command = [
+    "sh", "-c",
+    "for i in $(seq 1 20); do npx prisma db push --accept-data-loss --skip-generate --schema=./app/prisma/schema.prisma && exit 0; sleep 2; done; exit 1"
+  ]
+
+  depends_on = [docker_container.postgres]
+
+  # must_run=false + attach=true is the kreuzwerker/docker provider's documented pattern for
+  # a one-shot container: Terraform attaches to it and waits for exit before considering this
+  # resource created, so docker_container.app's depends_on below genuinely waits for the
+  # schema to be applied first -- not just for this container to be *created*.
+  must_run = false
+  attach   = true
+}
+
 resource "docker_container" "app" {
   name  = "first90-app"
   image = docker_image.app.image_id
@@ -67,7 +114,7 @@ resource "docker_container" "app" {
 
   env = [
     "LLM_PROVIDER=${var.llm_provider}",
-    "SIDECAR_URL=http://host.docker.internal:${var.sidecar_port}",
+    "INFERENCE_SIDECAR_URL=http://host.docker.internal:${var.sidecar_port}",
     "DATABASE_URL=postgresql://${var.postgres_user}:${var.postgres_password}@${docker_container.postgres.name}:5432/${var.postgres_db}?schema=public",
   ]
 
@@ -76,7 +123,7 @@ resource "docker_container" "app" {
     external = var.app_port
   }
 
-  depends_on = [docker_container.postgres]
+  depends_on = [docker_container.postgres, docker_container.migrate]
 
   restart = "unless-stopped"
 }
