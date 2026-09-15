@@ -1,71 +1,87 @@
-# Current State — updated 2026-09-14T13:10Z
+# Current State — updated 2026-09-15T04:30Z
 
-Block: 3 (integration) — **in progress.** `/api/readyz` merged (PR #64). Sidecar wiring
-fixes merged (PR #65, squash-merged as `cc66da4`) — real Agent SDK inference now verified
-working end-to-end.
+Block: 3 (integration) — **in progress, core work done.** `/api/readyz` (PR #64), sidecar
+live-wiring (PR #65), Docker/Prisma-generate/WORKDIR fixes (PR #66), and cross-route
+persistence (SPEC-004, PR #75) all merged. The app now runs real Agent SDK inference and
+real Postgres-backed persistence end to end, verified live against the actual container.
 
-Active specs: `SPEC-000`/`001`/`002`/`003` all merged, `Status: implemented`. PR #65 was a
-bug-fix PR against SPEC-000's already-implemented sidecar adapter, not new scope.
+Active specs: `SPEC-000`–`SPEC-004` all merged, `Status: implemented`.
 
 ## In flight
 
-- No active worktrees, no open PRs. Working tree clean on `main` at `cc66da4`. Branch
-  `block-3/sidecar-live-wiring` merged and deleted (local + remote).
-- PR #65 fixed three real bugs found via live testing (not just mocked-boundary unit tests)
-  against a real `claude-agent-sdk` process: (1) `zodToJsonSchema(schema, "Name")`'s
-  `$ref`/`definitions` wrapper rejected by the Anthropic API; (2) `generatePlan`'s array
-  return type rejected by the same tool-use `input_schema` constraint, fixed by wrapping as
-  `{ milestones: [...] }`; (3) a client/server timeout race (both were 30s with no margin),
-  split into per-operation budgets — `/diagnose` 30s server/40s client, `/plan` 60s
-  server/70s client (raised specifically because live testing showed plan generation
-  consistently exceeded a shared 30s ceiling; confirmed with Dele before changing it).
-- Verified live end-to-end via real browser interaction (not curl, not mocks): a real STARS
-  diagnosis and a real 30/60/90 plan both round-tripped through the sidecar to a live Agent
-  SDK call (subscription auth via the bundled SDK executable, not a PATH-installed `claude`
-  CLI — see Do not forget) and rendered correctly in the app. Both dev processes (sidecar,
-  app) stopped cleanly after verification — nothing left running.
+- No active worktrees, no open PRs. Working tree clean on `main` at `82ee4a4`.
+- **SPEC-004 (cross-route persistence)** — the app's in-memory demo store
+  (`app/app/_lib/store.ts`) is replaced with real Prisma-backed repositories for diagnosis,
+  plan, and stakeholder state. Implemented via subagent-driven development (6 tasks, 3
+  review passes: per-task, whole-branch, and a fix-wave re-review). Fixed 3 real bugs found
+  via live testing, none caught by unit tests alone:
+  1. A manual-stakeholder id counter that reset per-process but collided with an
+     id-keyed Prisma upsert — silent data loss across restarts. Fixed with
+     `crypto.randomUUID()`.
+  2. **No Prisma migration mechanism existed anywhere in the project** — a fresh Postgres
+     had zero tables. Fixed with a new `migrate` service in `docker-compose.yml` (runs
+     `prisma db push` from the `Dockerfile`'s `builder` stage before `app` starts;
+     `docker compose up --build` now works standalone, zero manual steps, verified with a
+     fully fresh volume).
+  3. CI's `build` job would have failed the moment this PR opened — no `prisma generate`
+     step in CI, and this is the first code to construct a `PrismaClient` at module scope
+     (which `next build` now exercises). Fixed at the root cause: added a `prisma.schema`
+     config key to root `package.json`. Verified twice, independently, via a genuinely clean
+     `rm -rf node_modules && npm ci && npm run build` (not a warm worktree) — and confirmed
+     green in real CI on the PR itself.
+  - **Known gap, deliberately not fixed:** `infra/terraform/main.tf` has the identical
+    missing-schema-application problem `docker-compose.yml` just fixed. Filed as issue #74,
+    tracked separately (out of scope for SPEC-004 — that spec is about the app's persistence
+    wiring, not infra provisioning). Relevant when the Terraform verification step below is
+    actually run.
+  - **Ruled, not fixed:** 6 of the app's 8 server actions (and all 3 page renders) have no
+    explicit DB-failure error handling — an accepted risk for this capstone's demo scope
+    (documented in `PLAN-004`'s Risks section), not a defect. `/api/readyz` already surfaces
+    DB unavailability operationally.
+- Verified live end-to-end via real browser against a real container: diagnose → plan (the
+  original cross-route bug) → edit → stakeholders, all confirmed to persist correctly across
+  page navigation, on a genuinely fresh Docker volume.
 - The stray `copilot-worktrees/.../dolowoyo-studious-guacamole` worktree at `0000000` is
   still present, still unexplained, still not touched.
 
 ## Next 3 actions
 
-1. Run the fuller verification checklist from `docs/00-capstone-plan.md`: `docker compose up
-   --build` including the app container, and `cd infra/terraform && terraform apply` for
-   the real IaC stack (items 5-6). `lib/inference` changed in PR #65, so re-confirm the
-   fixture-mode smoke check (`/`, `/diagnosis`, `/plan`, `/stakeholders`, `/api/healthz`,
-   `/api/readyz`) still holds as part of this.
+1. **Terraform apply verification** (`docs/00-capstone-plan.md` checklist item 6,
+   `cd infra/terraform && terraform apply`) — not yet started. Will hit issue #74's gap
+   (no schema application) the moment the app is actually used against it, not just
+   `terraform apply` succeeding structurally — plan to fix that gap as part of this step,
+   not just discover it again.
 2. Seed a coherent demo persona (`fixtures/synthetic-org.json`-backed) for the video
    walkthrough.
-3. Consider whether `generatePlan`'s now-70s client timeout needs a demo-side loading state
-   (the live UI currently shows no progress indicator during the ~15-32s real-inference
-   wait) — not blocking, but worth a look before recording the sidecar demo segment.
+3. Consider a demo-side loading indicator for the sidecar's real ~15-32s inference wait
+   (still unaddressed, carried over from the last checkpoint) — not blocking.
 
 ## Blockers / open decisions
 
 - **Block 2's screen capture was never recorded and can't be recreated** — logged in
-  decision-log.md (2026-09-13). Block 3 (this session) is being recorded live.
+  decision-log.md (2026-09-13). Block 3 is being recorded live.
 - **Unexplained, not touched:** stray `copilot-worktrees/.../dolowoyo-studious-guacamole`
   worktree at commit `0000000`.
 - `npm audit` still flags dev-toolchain vulnerabilities (vitest/vite/esbuild/prisma) — low
   priority, unresolved, whenever convenient.
+- Issue #74 (Terraform migration gap) — open, backlog, not yet scheduled beyond "next action
+  #1" above.
 
 ## Do not forget
 
 - **The `claude` CLI is not on `PATH` in this environment** — it only exists bundled inside
-  the versioned VS Code extension directory
-  (`~/.vscode/extensions/anthropic.claude-code-*/resources/native-binary/claude`). This
-  didn't block the sidecar: `@anthropic-ai/claude-agent-sdk-darwin-arm64` ships its own
-  ~200MB bundled executable at `node_modules/@anthropic-ai/claude-agent-sdk-darwin-arm64/
-  claude`, which is what `services/inference-sidecar` actually uses via the SDK's `query()`
-  — confirmed working with real subscription auth. Worth remembering if a future session
-  sees `which claude` fail and assumes the sidecar can't authenticate; it can.
-- **This session's agent could not merge its own PR** — `gh pr merge` was denied by Claude
-  Code's auto-mode safety classifier ("Merge Without Review"), the same class of guardrail
-  that blocked self-approval during Block 1's branch-protection work. Dele merged PR #65
-  manually. Expect this for every future PR in this project unless auto-mode settings change.
+  the versioned VS Code extension directory. Irrelevant to the sidecar's actual operation:
+  `@anthropic-ai/claude-agent-sdk-darwin-arm64` ships its own bundled executable, confirmed
+  working with real subscription auth.
+- **Merging a PR from within an agent session requires an explicit, in-the-moment
+  instruction from Dele in the same turn** — `gh pr merge` run autonomously (without Dele
+  having just said "merge it") was denied by Claude Code's auto-mode safety classifier
+  ("Merge Without Review") on PR #65. The identical command succeeded later in this session
+  for PRs #66, #67, and #75, each time immediately after Dele explicitly said to merge.
+  Don't attempt a merge speculatively; wait for the explicit instruction.
 - Recording is live (QuickTime, screen + mic) — Block 3 work should continue to be captured
   as real footage.
 - `docs/DEMO_SCRIPT.md` does not exist yet — a Block 4 deliverable, written after Block 3
   wraps.
-- Docker daemon (Colima): not re-verified this checkpoint; Block 3's Docker/Terraform step
-  (Next action #1) hasn't started yet.
+- Docker daemon (Colima): confirmed running and working as of this checkpoint (full
+  `docker compose up --build` cycles run repeatedly during SPEC-004 verification).
