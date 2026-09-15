@@ -1,6 +1,6 @@
 # SPEC-004 — Cross-route persistence for diagnosis, plan, and stakeholder state
 
-**Status:** draft
+**Status:** implemented
 **Owner:** architect
 **Depends on:** SPEC-001 (STARS diagnosis), SPEC-002 (30/60/90 plan — reuses `lib/plan/repository.ts`
 unchanged), SPEC-003 (stakeholder map)

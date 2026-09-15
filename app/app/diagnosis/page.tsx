@@ -1,9 +1,15 @@
 import { STARS_TYPES } from "@lib/inference/schemas/stars-diagnosis";
-import { getDiagnosisRecord, getLastIntakeError } from "../_lib/store";
+import { getLastIntakeError } from "../_lib/store";
+import { diagnosisRepository } from "../_lib/prisma-instances";
 import { correctDiagnosisAction, submitIntakeAction } from "../_lib/actions";
 
-export default function DiagnosisPage() {
-  const record = getDiagnosisRecord();
+// This page reads current DB state on every request (SPEC-004: diagnosis state persists
+// across routes/processes); it must never be statically prerendered/cached at build time
+// or the deployed app would freeze on a build-time snapshot.
+export const dynamic = "force-dynamic";
+
+export default async function DiagnosisPage() {
+  const record = await diagnosisRepository.findLatest();
   const error = getLastIntakeError();
 
   return (

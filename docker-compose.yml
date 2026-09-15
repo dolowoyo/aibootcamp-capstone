@@ -1,5 +1,10 @@
 name: aibootcamp-capstone
 
+# Single source of truth for the Postgres connection string, shared via YAML anchor by
+# both `migrate` and `app` below -- avoids the two silently drifting if credentials ever
+# change in only one place (found during task review, PLAN-004 Task 6).
+x-database-url: &database-url postgresql://first90:first90@postgres:5432/first90?schema=public
+
 # Local dev / demo stack: app + postgres 16 + otel-collector.
 #
 # Inference: LLM_PROVIDER defaults to `fixture` (no host process needed to bring this
@@ -12,6 +17,32 @@ name: aibootcamp-capstone
 # app container back to that host process.
 
 services:
+  # One-off: applies prisma/schema.prisma to postgres, then exits. Runs from the `builder`
+  # stage (not `app`'s own runner image) because the runner is deliberately minimal --
+  # Next's file-tracing for `output: standalone` only includes what the compiled server
+  # bundle actually requires at runtime, which never includes the `prisma` CLI or the raw
+  # `schema.prisma` file (only invoked as a separate process, never `require()`d). The
+  # builder stage already has both, so it's the natural place to run this rather than
+  # bloating the runner image just to fit a one-time setup step. `db push` (not `migrate
+  # deploy`) is deliberate: no migration history exists yet in this project, and a single
+  # demo database with no real data (docs/constitution.md principle VII) doesn't need
+  # migration-file provenance -- `--accept-data-loss` is safe here for the same reason.
+  # Found necessary during Block 3 integration: nothing in this repo had ever applied the
+  # schema to a real database before, so every repository call failed with "relation does
+  # not exist" the first time real persistence (not just readyz's tableless SELECT 1) was
+  # exercised against a fresh Postgres.
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    command: ["npx", "prisma", "db", "push", "--accept-data-loss", "--skip-generate", "--schema=./app/prisma/schema.prisma"]
+    environment:
+      DATABASE_URL: *database-url
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   app:
     build:
       context: .
@@ -21,7 +52,7 @@ services:
     environment:
       LLM_PROVIDER: ${LLM_PROVIDER:-fixture}
       INFERENCE_SIDECAR_URL: http://host.docker.internal:8787
-      DATABASE_URL: postgresql://first90:first90@postgres:5432/first90?schema=public
+      DATABASE_URL: *database-url
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       NODE_ENV: production
     extra_hosts:
@@ -33,6 +64,8 @@ services:
         condition: service_healthy
       otel-collector:
         condition: service_started
+      migrate:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s

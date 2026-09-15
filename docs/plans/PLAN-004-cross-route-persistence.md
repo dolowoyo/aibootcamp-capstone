@@ -160,3 +160,8 @@ repositionStakeholderAction:
   a gap in this plan, but worth remembering when deciding a task is "done": repository tests
   passing is necessary, not sufficient: the docker compose full run below must genuinely
   pass to close this bug.
+- **DB unavailability outside the two guarded actions (`submitIntakeAction`,
+  `generatePlanAction`) surfaces as an unhandled server-action rejection or page-render
+  error, not a friendly message** — an accepted risk for this capstone's demo scope,
+  operationally visible via `/api/readyz`. Not fixed here; would need revisiting for a real
+  deployment.
