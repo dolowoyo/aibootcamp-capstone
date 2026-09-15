@@ -620,3 +620,62 @@ by actually running the real stack end to end rather than trusting that "the sch
 because the ORM code compiles.
 
 ---
+
+## 2026-09-15 — Publishing the app image for the first time surfaced four bugs in a row
+
+**Context:** Completing Block 3's Terraform verification required a real published app
+image — `infra/terraform`'s `docker_image.app` always pulls from GHCR, never builds
+locally. No tag had ever been pushed in this repo, so `publish.yml` had never actually run.
+Pushed `v0.1.0` to trigger it.
+
+**What happened, in the order each was found (each only visible once the previous one was
+fixed and the workflow got further than before):**
+
+1. `publish.yml` referenced `aquasecurity/trivy-action@0.29.0` (missing the tag's real `v`
+   prefix) — the action itself failed to resolve. Confirmed via the GitHub API that the
+   real tag is `v0.29.0`.
+2. Fixed, retried — `trivy-action@v0.29.0` itself pins `aquasecurity/setup-trivy@v0.2.2`
+   internally, a tag that no longer exists in that repo. Bumped to `trivy-action@v0.36.0`,
+   which pins `setup-trivy` by commit hash instead of a mutable tag.
+3. Fixed, retried — the workflow finally got far enough to build and push the image for
+   real, then genuinely failed Trivy's CRITICAL/HIGH gate. Confirmed real (not a config
+   bug) by installing `trivy` locally and reproducing before touching anything: npm's own
+   bundled `tar`/`sigstore` (used only for `npm install`'s package-fetching/provenance,
+   never exercised in this runtime image — removed outright), a stale nested
+   `postcss@8.4.31` pinned inside `next@15.5.25` itself (fixed via an `overrides` entry,
+   which needed a fully fresh `package-lock.json` regeneration before it actually took —
+   a stale lockfile silently kept the old resolution even after `node_modules` was wiped),
+   and an outdated Alpine `libssl3`/`libcrypto3` in the cached base layer (fixed with an
+   explicit `apk upgrade`).
+4. Fixed, retried — the image built and passed Trivy, but was amd64-only
+   (`build-push-action`'s default when no `platforms` is set is the runner's own
+   architecture). `docker pull` failed on this Apple Silicon host with "no matching
+   manifest for linux/arm64/v8." Added `platforms: linux/amd64,linux/arm64` plus
+   `docker/setup-qemu-action` (buildx alone doesn't provide cross-arch emulation).
+
+`infra/terraform/main.tf` itself also had two of the same gaps `docker-compose.yml` had
+already hit and fixed: `SIDECAR_URL` instead of `INFERENCE_SIDECAR_URL`, and no mechanism
+to apply `prisma/schema.prisma` to a fresh Postgres. Fixed both (the latter via a
+`docker_container.migrate` resource, built from the `Dockerfile`'s `builder` stage, using
+the `must_run=false`/`attach=true` pattern so Terraform genuinely waits for it to finish
+before creating the app container).
+
+**Result:** a full `terraform apply` succeeded end to end for the first time — all 7
+resources, real Postgres, real schema migration, real published multi-arch image, real
+`healthz`/`readyz` 200s — then `terraform destroy` cleanly, leaving a genuinely fresh slate
+for the recorded demo's live `terraform apply`.
+
+**Why this matters for the video:** four independent, unrelated bugs, each hidden behind
+the previous one, all in a code path (`publish.yml`) that had literally never executed
+before today despite existing since early in the project. This is the sharpest example yet
+of this capstone's recurring theme — CI passing and code compiling prove nothing about a
+path nobody has actually run — because here it wasn't one bug caught by "actually running
+it," it was a whole queue of them, each waiting behind the last.
+
+**Time-pressure note:** this work happened right before the planned recording session, and
+Dele explicitly chose to wait for the real Terraform apply to finish rather than cut it
+per `docs/00-capstone-plan.md`'s own stated cut-line rule — a deliberate call to keep the
+video's platform beat honest (a real `apply`, not a `docker compose` substitute) even under
+time pressure, not an accident of not noticing the cut-line existed.
+
+---
