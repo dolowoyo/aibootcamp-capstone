@@ -34,6 +34,39 @@ describe("plan repository", () => {
     const writer = createPrismaPlanRepository(mockClient);
     await writer.save(plan);
 
+    // Proves save() actually passed the plan's milestones to Prisma's upsert, not just that
+    // findUnique's mocked return value round-trips correctly (see
+    // lib/stars/repository.spec.ts's "retrieval returns the most recently saved diagnosis"
+    // test for the pattern this mirrors).
+    expect(upsertMock).toHaveBeenCalledWith({
+      where: { diagnosisId: plan.diagnosisId },
+      create: {
+        diagnosisId: plan.diagnosisId,
+        milestones: {
+          create: plan.milestones.map((m) => ({
+            externalId: m.id,
+            phase: m.phase,
+            order: m.order,
+            text: m.text,
+            rationale: m.rationale,
+          })),
+        },
+      },
+      update: {
+        milestones: {
+          deleteMany: {},
+          create: plan.milestones.map((m) => ({
+            externalId: m.id,
+            phase: m.phase,
+            order: m.order,
+            text: m.text,
+            rationale: m.rationale,
+          })),
+        },
+      },
+      include: { milestones: true },
+    });
+
     // The row findUnique would return, deliberately in the same (unsorted-by-order)
     // sequence as `plan.milestones` above, so this test actually proves find() sorts
     // rather than merely echoing an already-sorted fixture.

@@ -47,6 +47,28 @@ describe("stakeholder repository", () => {
     const writer = createPrismaStakeholderRepository(mockClient);
     await writer.saveAll([stakeholder]);
 
+    // Proves saveAll actually passed the stakeholder's data to Prisma's upsert, not just
+    // that findAll's mocked return value round-trips correctly (see lib/stars/repository.spec.ts's
+    // "retrieval returns the most recently saved diagnosis" test for the pattern this mirrors).
+    expect(upsertMock).toHaveBeenCalledWith({
+      where: { id: stakeholder.id },
+      create: {
+        id: stakeholder.id,
+        name: stakeholder.name,
+        influence: stakeholder.influence,
+        support: stakeholder.support,
+        quadrant: stakeholder.quadrant,
+        source: stakeholder.source,
+      },
+      update: {
+        name: stakeholder.name,
+        influence: stakeholder.influence,
+        support: stakeholder.support,
+        quadrant: stakeholder.quadrant,
+        source: stakeholder.source,
+      },
+    });
+
     // A separately constructed instance, mirroring what a second process/route would see.
     findManyMock.mockResolvedValueOnce([savedRow]);
     const reader = createPrismaStakeholderRepository(mockClient);
@@ -75,6 +97,27 @@ describe("stakeholder repository", () => {
 
     const writer = createPrismaStakeholderRepository(mockClient);
     await writer.saveAll([{ ...stakeholder, quadrant: "opponent" }]);
+
+    // Proves the reposition was actually passed to Prisma's upsert, not just that findAll's
+    // mocked return value round-trips correctly.
+    expect(upsertMock).toHaveBeenCalledWith({
+      where: { id: stakeholder.id },
+      create: {
+        id: stakeholder.id,
+        name: stakeholder.name,
+        influence: stakeholder.influence,
+        support: stakeholder.support,
+        quadrant: "opponent",
+        source: stakeholder.source,
+      },
+      update: {
+        name: stakeholder.name,
+        influence: stakeholder.influence,
+        support: stakeholder.support,
+        quadrant: "opponent",
+        source: stakeholder.source,
+      },
+    });
 
     findManyMock.mockResolvedValueOnce([updatedRow]);
     const reader = createPrismaStakeholderRepository(mockClient);

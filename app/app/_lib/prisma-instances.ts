@@ -2,6 +2,7 @@ import { getPrismaClient } from "./prisma-client";
 import { createPrismaDiagnosisRepository } from "@lib/stars/repository";
 import { createPrismaPlanRepository, type PrismaPlanClient } from "@lib/plan/repository";
 import { createPrismaStakeholderRepository } from "@lib/stakeholders/repository";
+import { buildStakeholderMap, type StakeholderMap } from "@lib/stakeholders/map";
 
 /**
  * Repository singletons wired against the shared `PrismaClient` (see `./prisma-client`).
@@ -24,3 +25,21 @@ export const planRepository = createPrismaPlanRepository(
   getPrismaClient() as unknown as PrismaPlanClient,
 );
 export const stakeholderRepository = createPrismaStakeholderRepository(getPrismaClient());
+
+/**
+ * Loads all persisted stakeholders and rebuilds the current `StakeholderMap` from them.
+ * `buildStakeholderMap`'s second argument is documented as the *manual* list only (see
+ * `lib/stakeholders/map.ts`) -- once MCP fetching is actually wired in (the `status:
+ * "unavailable"` below is a placeholder for that future task), any MCP-sourced stakeholder
+ * row that was previously persisted would otherwise be concatenated a second time alongside
+ * the fresh MCP result. Filtering to `source === "manual"` here keeps that latent duplication
+ * from ever surfacing. Centralized here (rather than duplicated in each call site) so
+ * `actions.ts`'s stakeholder actions and `stakeholders/page.tsx` all share one implementation.
+ */
+export async function loadStakeholderMap(): Promise<StakeholderMap> {
+  const stakeholders = await stakeholderRepository.findAll();
+  return buildStakeholderMap(
+    { status: "unavailable" },
+    stakeholders.filter((s) => s.source === "manual")
+  );
+}
