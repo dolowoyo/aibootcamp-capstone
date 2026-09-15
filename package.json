@@ -20,5 +20,11 @@
   },
   "prisma": {
     "schema": "app/prisma/schema.prisma"
+  },
+  "overrides": {
+    "postcss": "8.5.28",
+    "next": {
+      "postcss": "8.5.28"
+    }
   }
 }
