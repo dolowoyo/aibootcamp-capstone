@@ -41,6 +41,9 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest
 
+      - name: Set up QEMU (for cross-building linux/arm64 on this amd64 runner)
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -51,6 +54,13 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          # Without this, build-push-action defaults to the runner's own architecture
+          # (amd64 on GitHub-hosted runners) -- found via `terraform apply`/`docker pull`
+          # failing with "no matching manifest for linux/arm64/v8" on Apple Silicon, the
+          # actual machine this capstone's local IaC (infra/terraform, docs/adr/
+          # 0003-local-iac.md) is meant to run on. Buildx + QEMU cross-builds both from one
+          # amd64 runner.
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
