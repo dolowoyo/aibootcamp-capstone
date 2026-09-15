@@ -577,3 +577,46 @@ the same class of guardrail that blocked self-approval during Block 1's branch-p
 work. All 6 required checks are green; merge is pending Dele.
 
 ---
+
+## 2026-09-14 — No Prisma migration mechanism existed anywhere; added a one-off `migrate` service
+
+**Context:** Manually verifying SPEC-004's cross-route persistence fix (PLAN-004, Task 6)
+against a real `docker compose up --build` container. `psql \dt` showed zero tables — no
+migration or `db push` step existed anywhere in the project (`app/prisma` has no
+`migrations/` directory; nothing in `Dockerfile`, `docker-compose.yml`, or any `package.json`
+script ever applies `schema.prisma` to a database). This predates this session entirely; it
+never surfaced before because `/api/readyz`'s liveness check is a tableless `SELECT 1`, and
+Tasks 2-5's repository work was the first code to ever exercise a real table against a real
+Postgres instance.
+
+**Decision:** Added a `migrate` service to `docker-compose.yml`, built from the `Dockerfile`'s
+`builder` stage (which already has the Prisma CLI and schema file for the pre-existing
+`prisma generate` build step; the `app` runner image deliberately doesn't, since Next's
+file-tracing for `output: standalone` only includes what the compiled server bundle actually
+requires at runtime). It runs `prisma db push --accept-data-loss --skip-generate` once and
+exits; `app` now depends on it via `condition: service_completed_successfully`. Verified with
+a fully fresh volume (`docker compose down -v && up --build`): zero manual steps needed,
+`migrate` exits 0, all four tables exist immediately after, `app` comes up healthy.
+
+**Why `db push` over `migrate deploy`:** no migration history exists yet in this project, and
+this compose stack only ever targets a single local demo database containing fabricated
+fixture/test data (`docs/constitution.md` principle VII) — migration-file provenance and the
+data-loss guardrails `migrate deploy` exists for don't apply the same way here.
+`--accept-data-loss` is safe for the same reason; it would not be an acceptable default
+against a shared or production database.
+
+**Known gap, not fixed here:** `infra/terraform/main.tf`'s Docker-provisioned stack
+(`docs/adr/0003-local-iac.md`) has the identical problem — it provisions Postgres and the app
+container with a `DATABASE_URL` but nothing applies the schema. Anyone running the Terraform
+path hits the same "relation does not exist" failure `docker-compose.yml` just fixed. Not
+addressed in this PR (out of scope for SPEC-004, which is about the app's persistence wiring,
+not infra provisioning) — filed as a GitHub issue instead, per constitution principle VI
+(scope drift becomes a filed issue, never a silently-left gap).
+
+**Why this matters for the video:** a second, distinct instance of a class of finding that's
+recurred throughout Block 3 — a piece of infrastructure plumbing (Prisma migrations, in this
+case) that every individual piece of work assumed was someone else's problem, surfaced only
+by actually running the real stack end to end rather than trusting that "the schema exists"
+because the ORM code compiles.
+
+---

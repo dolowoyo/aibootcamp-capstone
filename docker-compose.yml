@@ -1,5 +1,10 @@
 name: aibootcamp-capstone
 
+# Single source of truth for the Postgres connection string, shared via YAML anchor by
+# both `migrate` and `app` below -- avoids the two silently drifting if credentials ever
+# change in only one place (found during task review, PLAN-004 Task 6).
+x-database-url: &database-url postgresql://first90:first90@postgres:5432/first90?schema=public
+
 # Local dev / demo stack: app + postgres 16 + otel-collector.
 #
 # Inference: LLM_PROVIDER defaults to `fixture` (no host process needed to bring this
@@ -33,7 +38,7 @@ services:
       target: builder
     command: ["npx", "prisma", "db", "push", "--accept-data-loss", "--skip-generate", "--schema=./app/prisma/schema.prisma"]
     environment:
-      DATABASE_URL: postgresql://first90:first90@postgres:5432/first90?schema=public
+      DATABASE_URL: *database-url
     depends_on:
       postgres:
         condition: service_healthy
@@ -47,7 +52,7 @@ services:
     environment:
       LLM_PROVIDER: ${LLM_PROVIDER:-fixture}
       INFERENCE_SIDECAR_URL: http://host.docker.internal:8787
-      DATABASE_URL: postgresql://first90:first90@postgres:5432/first90?schema=public
+      DATABASE_URL: *database-url
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       NODE_ENV: production
     extra_hosts:
